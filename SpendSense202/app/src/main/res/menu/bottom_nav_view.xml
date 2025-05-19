@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Home" android:id="@+id/home" android:icon="@drawable/home_4_svgrepo_com"/>
+    <item android:title="Calendar" android:id="@+id/calendar" android:icon="@drawable/calendar_days_svgrepo_com"/>
+    <item android:title="Finances" android:id="@+id/add" android:icon="@drawable/finance_svgrepo_com"/>
+    <item android:title="Goals" android:id="@+id/goals" android:icon="@drawable/trophy_svgrepo_com"/>
+    <item android:title="Profile" android:id="@+id/profile" android:icon="@drawable/profile_round_1342_svgrepo_com"/>
+</menu>
