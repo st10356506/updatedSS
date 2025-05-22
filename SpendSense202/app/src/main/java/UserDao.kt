@@ -1,4 +1,4 @@
-package com.example.spendsense20.data
+/*package com.example.spendsense20.data
 import androidx.room.*
 import com.example.spendsense20.model.User
 @Dao
@@ -12,3 +12,5 @@ interface UserDao {
         @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
         suspend fun getUserById(id: Int): User?
 }
+
+ */

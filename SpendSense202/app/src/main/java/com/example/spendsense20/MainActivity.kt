@@ -26,16 +26,25 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        bottomNavView.setOnItemSelectedListener{
-            when(it.itemId){
+        bottomNavView.setOnItemSelectedListener {
+            when(it.itemId) {
                 R.id.home -> replaceFragment(HomeFragment())
                 R.id.calendar -> replaceFragment(CalendarFragment())
                 R.id.goals -> replaceFragment(GoalFragment())
                 R.id.add -> replaceFragment(AddFragment())
-                R.id.profile -> replaceFragment(ProfileFragment())
+                R.id.profile -> {
+                    val profileFragment = ProfileFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("username", "userUsername")  // Replace with actual username
+                            putString("email", "userEmail") // Replace with actual email
+                        }
+                    }
+                    replaceFragment(profileFragment)
+                }
             }
             true
         }
+
     }
 
     fun replaceFragment(frag : Fragment){

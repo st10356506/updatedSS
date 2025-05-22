@@ -4,44 +4,39 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.example.spendsense20.data.AppDatabase
-import com.example.spendsense20.data.UserDao
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.google.firebase.database.*
 
 class Login : AppCompatActivity() {
-    private lateinit var usernameEditText: TextInputEditText
+
+    private lateinit var emailEditText: TextInputEditText
     private lateinit var passwordEditText: TextInputEditText
     private lateinit var loginButton: Button
     private lateinit var backToRegisterText: TextView
-    private lateinit var userDao: UserDao
+    private lateinit var databaseRef: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_login)
 
         // Bind views
-        usernameEditText = findViewById(R.id.etUsername)
+        emailEditText = findViewById(R.id.etUsername) // Rename if needed in XML
         passwordEditText = findViewById(R.id.etPassword)
         loginButton = findViewById(R.id.btnLogin)
         backToRegisterText = findViewById(R.id.tvbackToReg)
 
-        // Initialize DAO
-        val db = AppDatabase.getDatabase(this)
-        userDao = db.userDao()
+        // Reference to Firebase Database
+        databaseRef = FirebaseDatabase.getInstance().getReference("users")
 
         // Handle login button click
         loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString().trim()
+            val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
             } else {
-                loginUser(username, password)
+                loginUser(email, password)
             }
         }
 
@@ -52,25 +47,35 @@ class Login : AppCompatActivity() {
         }
     }
 
-    private fun loginUser(username: String, password: String) {
-        lifecycleScope.launch {
-            val user = withContext(Dispatchers.IO) {
-                userDao.login(username, password)
-            }
+    private fun loginUser(email: String, password: String) {
+        // Query by email
+        databaseRef.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (userSnap in snapshot.children) {
+                            val user = userSnap.getValue(User::class.java)
+                            if (user != null && user.password == password) {
+                                Toast.makeText(this@Login, "Welcome, ${user.username}!", Toast.LENGTH_SHORT).show()
 
-            if (user != null) {
-                Toast.makeText(this@Login, "Welcome, ${user.username}!", Toast.LENGTH_SHORT).show()
-
-                // Navigate to MainActivity with user info
-                val intent = Intent(this@Login, MainActivity::class.java).apply {
-                    putExtra("username", user.username)
-                    putExtra("email", user.email)
+                                val intent = Intent(this@Login, MainActivity::class.java).apply {
+                                    putExtra("username", user.username)
+                                    putExtra("email", user.email)
+                                }
+                                startActivity(intent)
+                                finish()
+                                return
+                            }
+                        }
+                        Toast.makeText(this@Login, "Incorrect password", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@Login, "User not found", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                startActivity(intent)
-                finish()
-            } else {
-                Toast.makeText(this@Login, "Invalid credentials", Toast.LENGTH_SHORT).show()
-            }
-        }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@Login, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 }
