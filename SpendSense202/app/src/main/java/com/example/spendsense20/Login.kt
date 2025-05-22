@@ -20,7 +20,7 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.fragment_login)
 
         // Bind views
-        emailEditText = findViewById(R.id.etUsername) // Rename if needed in XML
+        emailEditText = findViewById(R.id.etUsername)
         passwordEditText = findViewById(R.id.etPassword)
         loginButton = findViewById(R.id.btnLogin)
         backToRegisterText = findViewById(R.id.tvbackToReg)

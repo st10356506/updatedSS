@@ -2,6 +2,7 @@ package com.example.spendsense20.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -18,6 +19,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val userViewModel: UserViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,27 +28,39 @@ class ProfileFragment : Fragment() {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val email = activity?.intent?.getStringExtra("email")
-        if (email.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "No email passed",
-                Toast.LENGTH_SHORT).show()
 
+        val email = arguments?.getString("email")
+        val username = arguments?.getString("username")
+
+        Log.d("ProfileFragment", "Received username: $username, email: $email")
+        Toast.makeText(requireContext(), "Username: $username, Email: $email", Toast.LENGTH_LONG).show()
+
+        if (email.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "No email passed", Toast.LENGTH_SHORT).show()
             return
         }
+
+        binding.tvUsername.text = username
+        binding.tvEmail.text = email
+
         fetchUserData(email)
+
         binding.btnLogout.setOnClickListener {
             Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
             val intent = Intent(requireContext(), Login::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
+
         binding.ivEdit.setOnClickListener {
             showImageMenu()
         }
     }
+
+
     private fun showImageMenu() {
         val popup = PopupMenu(requireContext(), binding.ivEdit)
         popup.menuInflater.inflate(R.menu.menu_profile_image, popup.menu)
@@ -65,20 +79,23 @@ class ProfileFragment : Fragment() {
         }
         popup.show()
     }
+
     private fun fetchUserData(email: String) {
         lifecycleScope.launch {
             userViewModel.getUserByEmail(email) { fetchedUser ->
-                fetchedUser?.let {
+                if (!isAdded) return@getUserByEmail
 
+                fetchedUser?.let {
                     binding.tvUsername.text = it.username
                     binding.tvEmail.text = it.email
-                } ?: run {
-                    Toast.makeText(requireContext(), "User not found",
-                        Toast.LENGTH_SHORT).show()
+               }  ?: run {
+                    Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
