@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="dark_green">#2E7D32</color>
+    <color name="red">#F5F5F5</color>
+    <color name="blue">#2E7D32</color>
+    <color name="orange">#F5F5F5</color>
+    <color name="green">#2E7D32</color>
+    <color name="light_blue">#F5F5F5</color>
+    <color name="light_green">#2E7D32</color>
+    <color name="light_orange">#2E7D32</color>
+    <color name="teal_200">#2E7D32</color>
+    <color name="emerald_green">#1E8A5F</color>
+    <color name="forest_green">#0A573A</color>
+    <color name="sage_background">#E6F2EA</color>
+    <color name="primary">#2E7D32</color>
+    <color name="primary_dark">#1B5E20</color>
+    <color name="primary_light">#4CAF50</color>
+    <color name="accent">#66BB6A</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="background_color">#F5F5F5</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="button_primary">#2E7D32</color>
+    <color name="button_secondary">#455A64</color>
+    <color name="button_danger">#D32F2F</color>
+    <color name="button_success">#388E3C</color>
+    <color name="button_neutral">#EEEEEE</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="stroke_color">#E0E0E0</color>
+</resources>
