@@ -315,7 +315,7 @@ class AddFragment : Fragment() {
     private fun isEditingAllowedThisMonth(): Boolean {
         val calendar = Calendar.getInstance()
         val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-        return dayOfMonth <= 3  // Only allow editing during first 3 days
+        return dayOfMonth <= 31  // Only allow editing during first 3 days
     }
 
     override fun onDestroyView() {

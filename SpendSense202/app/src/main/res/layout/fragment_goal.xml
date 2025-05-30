@@ -49,6 +49,33 @@
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Category Spinner -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="#000000"
+            android:spinnerMode="dropdown"
+            android:autofillHints="#000000"
+            style="@style/BlackTextInputStyle"
+            android:padding="8dp" />
+
+        <!-- Other category input  -->
+        <EditText
+            android:id="@+id/editCustomCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter custom category"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:textSize="16sp"
+            style="@style/BlackTextInputStyle"
+            android:elevation="2dp" />
+
         <!-- Target Amount -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -84,6 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+
                 android:padding="16dp">
 
                 <TextView

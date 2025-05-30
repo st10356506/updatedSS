@@ -13,6 +13,7 @@ class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdap
     inner class GoalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val goalName: TextView = itemView.findViewById(R.id.tvGoalName)
         val goalAmount: TextView = itemView.findViewById(R.id.tvGoalAmount)
+        val category: TextView = itemView.findViewById(R.id.tvGoalCategory)
         val goalDate: TextView = itemView.findViewById(R.id.tvGoalDate)
         val monthlyContribution: TextView = itemView.findViewById(R.id.tvMonthlyContribution)
     }
@@ -27,6 +28,7 @@ class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdap
         val goal = goals[position]
         holder.goalName.text = goal.name
         holder.goalAmount.text = "Target: R${goal.amount}"
+        holder.category.text = "Category: ${goal.category}"
         holder.goalDate.text = "Due: ${goal.targetDate}"
         holder.monthlyContribution.text =
             "Contribution: R${goal.minContribution} - R${goal.maxContribution}"

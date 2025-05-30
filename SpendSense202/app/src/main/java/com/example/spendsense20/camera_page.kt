@@ -1,5 +1,7 @@
 package com.example.spendsense20
 
+import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +19,7 @@ import com.example.spendsense20.databinding.CameraPageBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,14 +33,31 @@ class CameraPage : AppCompatActivity() {
     private lateinit var databaseRef: DatabaseReference
     private val allEntries = mutableListOf<FinanceEntity>()
     private var userId: String? = null
+    private lateinit var pickMediaLauncher: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Initialize binding first
         binding = CameraPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get current Firebase user
+        //Setup date picker after binding is initialized
+        binding.editDate.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val datePicker = DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                    binding.editDate.setText(selectedDate)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            datePicker.show()
+        }
+
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
@@ -66,6 +86,7 @@ class CameraPage : AppCompatActivity() {
 
         imageUri = createImageUri()
 
+        // Register for the photo picker result
         pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 binding.imageView.setImageURI(uri)
@@ -76,6 +97,7 @@ class CameraPage : AppCompatActivity() {
             }
         }
 
+        // Register for the camera capture result
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 binding.imageView.setImageURI(imageUri)
@@ -154,7 +176,9 @@ class CameraPage : AppCompatActivity() {
             name = category,
             description = binding.editDescription.text.toString(),
             type = binding.spinnerType.selectedItem.toString().lowercase(),
-            date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
+            date = binding.editDate.text.toString().ifBlank {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            },
             imageUri = imageUri.toString()
         )
 
@@ -174,7 +198,6 @@ class CameraPage : AppCompatActivity() {
                 allEntries.clear()
                 for (child in snapshot.children) {
                     if (child.key == "balance" || child.key == "budget_editable") continue
-                    // Skip non-finance entries
                     val entry = child.getValue(FinanceEntity::class.java)
                     entry?.let { allEntries.add(it) }
                 }
@@ -187,8 +210,6 @@ class CameraPage : AppCompatActivity() {
         })
     }
 
-
-
     private fun createImageUri(): Uri {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val imageFileName = "camera_photo_$timeStamp.png"
@@ -198,5 +219,25 @@ class CameraPage : AppCompatActivity() {
             "${packageName}.fileprovider",
             imageFile
         )
+    }
+
+    // Function to save selected image to internal storage
+    private fun copyImageToInternalStorage(context: Context, uri: Uri): String? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val fileName = "image_${System.currentTimeMillis()}.jpg"
+            val file = File(context.filesDir, fileName)
+
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+
+            inputStream?.close()
+            outputStream.close()
+
+            file.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

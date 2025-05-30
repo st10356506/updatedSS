@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -17,14 +19,13 @@ import com.example.spendsense20.viewmodel.GoalViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
- 
 class GoalFragment : Fragment() {
 
     private var _binding: FragmentGoalBinding? = null
     private val binding get() = _binding!!
 
     private val seekBarMinLimit = 10
-    private val seekBarMaxLimit = 100000
+    private val seekBarMaxLimit = 1000000
 
     private var minContribution = seekBarMinLimit
     private var maxContribution = seekBarMaxLimit
@@ -33,6 +34,7 @@ class GoalFragment : Fragment() {
     private lateinit var viewModel: GoalViewModel
 
     private var selectedDate: String = ""
+    private var selectedCategory: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,14 +44,40 @@ class GoalFragment : Fragment() {
 
         viewModel = ViewModelProvider(this)[GoalViewModel::class.java]
 
-        setupSeekBars()     // Configure seek bars
-        setupDatePicker()   // Set up calendar picker
-        setupRecyclerView() // Prepare RecyclerView
-        setupAddGoalButton()// Add goal logic
-        observeGoals()      // Observe database
+        setupCategoryDropdown()
+        setupSeekBars()
+        setupDatePicker()
+        setupRecyclerView()
+        setupAddGoalButton()
+        observeGoals()
 
         return binding.root
     }
+
+    private fun setupCategoryDropdown() {
+        val categories = listOf("Food", "Transport", "Bills", "Shopping", "Salary", "Cheque", "Investments", "Bonus", "Other")
+
+        val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        binding.spinnerCategory.adapter = categoryAdapter
+
+        binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selected = parent.getItemAtPosition(position).toString()
+                selectedCategory = selected
+
+                // Show custom input if "Other" is selected
+                binding.editCustomCategory.visibility = if (selected == "Other") View.VISIBLE else View.GONE
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Optional: Reset category
+                selectedCategory = ""
+            }
+        }
+    }
+
 
     private fun observeGoals() {
         viewModel.allGoals.observe(viewLifecycleOwner) { goals ->
@@ -67,7 +95,6 @@ class GoalFragment : Fragment() {
 
         updateRangeText()
 
-        // Min seek bar listener
         binding.seekBarMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 minContribution = progress + seekBarMinLimit
@@ -82,7 +109,6 @@ class GoalFragment : Fragment() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Max seek bar listener
         binding.seekBarMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 maxContribution = progress + seekBarMinLimit
@@ -129,7 +155,7 @@ class GoalFragment : Fragment() {
             val name = binding.inputGoalName.text.toString().trim()
             val amountStr = binding.inputGoalAmount.text.toString().trim()
 
-            if (name.isEmpty() || amountStr.isEmpty() || selectedDate.isEmpty()) {
+            if (name.isEmpty() || amountStr.isEmpty() || selectedDate.isEmpty() || selectedCategory.isEmpty()) {
                 Toast.makeText(requireContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -140,17 +166,25 @@ class GoalFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Create new goal and insert
             val goal = Goal(
                 name = name,
                 amount = amount,
                 targetDate = selectedDate,
+                category = selectedCategory,
                 minContribution = minContribution,
                 maxContribution = maxContribution
             )
 
             viewModel.insertGoal(goal)
             clearInputs()
+
+            val category = if (binding.editCustomCategory.visibility == View.VISIBLE &&
+                binding.editCustomCategory.text.isNotBlank()) {
+                binding.editCustomCategory.text.toString()
+            } else {
+                selectedCategory
+            }
+
         }
     }
 
@@ -161,6 +195,8 @@ class GoalFragment : Fragment() {
         binding.seekBarMax.progress = maxContribution - seekBarMinLimit
         binding.inputGoalName.text?.clear()
         binding.inputGoalAmount.text?.clear()
+        binding.spinnerCategory.setSelection(0)
+        selectedCategory = ""
         binding.selectedDateText.text = ""
         selectedDate = ""
         updateRangeText()
