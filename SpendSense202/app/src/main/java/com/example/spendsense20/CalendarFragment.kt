@@ -26,7 +26,7 @@ class CalendarFragment : Fragment() {
     ): View {
         binding = FragmentCalendarBinding.inflate(inflater, container, false)
 
-        // ✅ Get current user's UID and setup user-specific DB reference
+        //Get current user's UID and setup user-specific DB reference
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
             Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()

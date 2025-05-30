@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.spendsense20.FinanceEntity
 import com.example.spendsense20.Login
 import com.example.spendsense20.R
 import com.example.spendsense20.databinding.FragmentProfileBinding
@@ -14,10 +15,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ProfileFragment : Fragment() {
+
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var databaseRef: DatabaseReference
     private lateinit var auth: FirebaseAuth
+    private lateinit var financeRef: DatabaseReference
+    private lateinit var userRef: DatabaseReference
+    private val goal = 15000.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,11 +48,13 @@ class ProfileFragment : Fragment() {
         val uid = currentUser.uid
         val email = currentUser.email
 
-        // ✅ Correctly display email
         binding.tvEmail.text = email ?: "No email"
 
-        // ✅ Fetch and display the username from Firebase Database
+        userRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
+        financeRef = FirebaseDatabase.getInstance().getReference("finances").child(uid)
+
         fetchUsername(uid)
+        fetchRankAndBadge()
 
         binding.btnLogout.setOnClickListener {
             auth.signOut()
@@ -67,18 +73,61 @@ class ProfileFragment : Fragment() {
     }
 
     private fun fetchUsername(uid: String) {
-        databaseRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
-        databaseRef.child("username").addListenerForSingleValueEvent(object : ValueEventListener {
+        userRef.child("username").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val username = snapshot.getValue(String::class.java)
                 binding.tvUsername.text = username ?: "Username not found"
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("ProfileFragment", "Database error: ${error.message}")
-                Toast.makeText(requireContext(), "Failed to load username", Toast.LENGTH_SHORT).show()
+                Log.e("ProfileFragment", "Failed to load username: ${error.message}")
             }
         })
+    }
+
+    private fun fetchRankAndBadge() {
+        financeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val finances = mutableListOf<FinanceEntity>()
+                for (child in snapshot.children) {
+                    val entity = child.getValue(FinanceEntity::class.java)
+                    if (entity != null) {
+                        finances.add(entity)
+                    }
+                }
+                updateRankUI(finances)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ProfileFragment", "Failed to fetch finances: ${error.message}")
+            }
+        })
+    }
+
+    private fun updateRankUI(finances: List<FinanceEntity>) {
+        val income = finances.filter { it.type == "income" }.sumOf { it.amount }
+        val expenses = finances.filter { it.type == "expense" }.sumOf { it.amount }
+        val balance = income - expenses
+
+        val points = (balance / 100).toInt().coerceAtLeast(0)
+        val rank = when {
+            points >= 200 -> "Platinum"
+            points >= 100 -> "Gold"
+            points >= 50 -> "Silver"
+            else -> "Bronze"
+        }
+
+        binding.tvUserRank.text = rank
+
+        val badgeRes = when (rank) {
+            "Bronze" -> R.drawable.bronze
+            "Silver" -> R.drawable.silver
+            "Gold" -> R.drawable.gold
+            "Platinum" -> R.drawable.platinum
+            else -> R.drawable.bronze
+        }
+
+        binding.ivRankBadge.setImageResource(badgeRes)
     }
 
     private fun showImageMenu() {

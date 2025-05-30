@@ -1,79 +1,129 @@
 package com.example.spendsense20
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HomeFragment : Fragment() {
 
-    private lateinit var financeAdapter: FinanceAdapter
     private lateinit var databaseRef: DatabaseReference
-    private val expensesList = mutableListOf<FinanceEntity>()
+    private var userId: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        databaseRef = FirebaseDatabase.getInstance().getReference("financeEntries")
-    }
+    // UI Elements
+    private lateinit var progressBarFill: View
+    private lateinit var tvFrequentCategory: TextView
+    private lateinit var tvPointsEarned: TextView
+    private lateinit var tvUserRank: TextView
+    private lateinit var tvProgressText: TextView
+    private lateinit var totalBalanceTextView: TextView
+    private lateinit var tvNextRankLabel: TextView
+    private lateinit var ivRankImage: ImageView
+
+    private val goal = 15000.0  // Target savings or earnings
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: android.view.LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
+            return view
+        }
+
+        databaseRef = FirebaseDatabase.getInstance().getReference("finances").child(userId!!)
+
+        // Bind views
+        progressBarFill = view.findViewById(R.id.progressBarFill)
+        tvFrequentCategory = view.findViewById(R.id.tvFrequentCategory)
+        tvPointsEarned = view.findViewById(R.id.tvPointsEarned)
+        tvUserRank = view.findViewById(R.id.tvUserRank)
+        tvProgressText = view.findViewById(R.id.tvProgressText)
+        totalBalanceTextView = view.findViewById(R.id.totalBalanceTextView)
+        tvNextRankLabel = view.findViewById(R.id.tvNextRankLabel)
+        ivRankImage = view.findViewById(R.id.ivRankImage)
+
+        listenToFinanceChanges()
+        return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val currentDateTextView = view.findViewById<TextView>(R.id.currentDateTextView)
-        currentDateTextView.text = getCurrentDate()
-
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewExpense)
-        financeAdapter = FinanceAdapter(
-            onImageClick = {
-                Toast.makeText(requireContext(), "Image preview not available here", Toast.LENGTH_SHORT).show()
-            },
-            onDeleteClick = {
-                Toast.makeText(requireContext(), "Deletion is not allowed on the Home page", Toast.LENGTH_SHORT).show()
-            }
-        )
-        recyclerView.adapter = financeAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        loadExpensesFromFirebase()
-    }
-
-    private fun loadExpensesFromFirebase() {
+    private fun listenToFinanceChanges() {
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                expensesList.clear()
+                val finances = mutableListOf<FinanceEntity>()
                 for (child in snapshot.children) {
-                    val finance = child.getValue(FinanceEntity::class.java)
-                    if (finance != null && finance.type == "Expense") {
-                        expensesList.add(finance)
+                    val entity = child.getValue(FinanceEntity::class.java)
+                    if (entity != null) {
+                        finances.add(entity)
                     }
                 }
-                financeAdapter.submitList(expensesList.toList()) // Create a new list to trigger update
+                updateUI(finances)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load data: ${error.message}", Toast.LENGTH_SHORT).show()
+                Log.e("HomeFragment", "Database error: ${error.message}")
             }
         })
     }
 
-    private fun getCurrentDate(): String {
-        val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
-        return dateFormat.format(calendar.time)
+    private fun updateUI(finances: List<FinanceEntity>) {
+        val income = finances.filter { it.type == "income" }.sumOf { it.amount }
+        val expenses = finances.filter { it.type == "expense" }.sumOf { it.amount }
+        val balance = income - expenses
+        val progressRatio = (balance / goal).coerceIn(0.0, 1.0)
+
+        totalBalanceTextView.text = "R %.2f".format(balance)
+
+        progressBarFill.post {
+            val parentWidth = (progressBarFill.parent as View).width
+            val newWidth = (parentWidth * progressRatio).toInt()
+            val params = progressBarFill.layoutParams
+            params.width = newWidth
+            progressBarFill.layoutParams = params
+        }
+
+        val percent = (progressRatio * 100).toInt()
+        tvProgressText.text = "$percent% of R${goal.toInt()}"
+
+        val categoryMap = finances.groupingBy { it.name }.eachCount()
+        val mostFrequent = categoryMap.maxByOrNull { it.value }?.key ?: "None"
+        tvFrequentCategory.text = mostFrequent
+
+        val points = (balance / 100).toInt().coerceAtLeast(0)
+        tvPointsEarned.text = "$points pts"
+
+        val currentRank = when {
+            points >= 200 -> "Platinum"
+            points >= 100 -> "Gold"
+            points >= 50 -> "Silver"
+            else -> "Bronze"
+        }
+        tvUserRank.text = currentRank
+
+
+        val rankDrawableRes = when (currentRank) {
+            "Bronze" -> R.drawable.bronze
+            "Silver" -> R.drawable.silver
+            "Gold" -> R.drawable.gold
+            "Platinum" -> R.drawable.platinum
+            else -> R.drawable.bronze
+        }
+        ivRankImage.setImageResource(rankDrawableRes)
+
+        val nextRank = when {
+            points < 50 -> "Silver"
+            points < 100 -> "Gold"
+            points < 200 -> "Platinum"
+            else -> "Max Rank Achieved"
+        }
+        tvNextRankLabel.text = "Progress to $nextRank"
     }
 }

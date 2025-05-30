@@ -71,21 +71,10 @@ class AddFragment : Fragment() {
             databaseRef.child("budget_editable").get().addOnSuccessListener { editSnapshot ->
                 isEditing = editSnapshot.getValue(Boolean::class.java) ?: true
 
-                // Check if editing is allowed right now (within first 3 days of month)
-                val canEditNow = isEditingAllowedThisMonth()
-                val finalEditingState = isEditing && canEditNow
-
-                updateUIEditingState(finalEditingState)
-                setEditingEnabled(finalEditingState)
             }.addOnFailureListener {
                 Log.e("AddFragment", "Failed to get editing state: ${it.message}")
                 isEditing = true
 
-                val canEditNow = isEditingAllowedThisMonth()
-                val finalEditingState = isEditing && canEditNow
-
-                updateUIEditingState(finalEditingState)
-                setEditingEnabled(finalEditingState)
             }
 
         }.addOnFailureListener {
@@ -132,20 +121,6 @@ class AddFragment : Fragment() {
 
             isEditing = false
             updateUIEditingState(false)
-        }
-
-        editButton.setOnClickListener {
-            if (isEditingAllowedThisMonth()) {
-                setEditingEnabled(true)
-                isEditing = true
-                updateUIEditingState(true)
-
-                databaseRef.child("budget_editable").setValue(true).addOnFailureListener {
-                    Log.e("AddFragment", "Failed to update editing state: ${it.message}")
-                }
-            } else {
-                Toast.makeText(requireContext(), "You can only edit the balance during the first 3 days of each month.", Toast.LENGTH_LONG).show()
-            }
         }
 
 
@@ -312,12 +287,6 @@ class AddFragment : Fragment() {
         adapterIncome.submitList(allEntries.filter { it.type.equals("income", ignoreCase = true) }.toList())
         adapterExpense.submitList(allEntries.filter { it.type.equals("expense", ignoreCase = true) }.toList())
     }
-    private fun isEditingAllowedThisMonth(): Boolean {
-        val calendar = Calendar.getInstance()
-        val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-        return dayOfMonth <= 31  // Only allow editing during first 3 days
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
