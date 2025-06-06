@@ -1,10 +1,12 @@
 package com.example.spendsense20
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -13,6 +15,14 @@ import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.emitter.Emitter
 import nl.dionsegijn.konfetti.xml.KonfettiView
 import java.util.concurrent.TimeUnit
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.formatter.PercentFormatter
+
 
 class HomeFragment : Fragment() {
 
@@ -27,17 +37,29 @@ class HomeFragment : Fragment() {
     private lateinit var tvProgressText: TextView
     private lateinit var totalBalanceTextView: TextView
     private lateinit var tvNextRankLabel: TextView
-    private lateinit var ivRankImage: ImageView
-    private lateinit var konfettiView: KonfettiView
+    private lateinit var ivRankImage : ImageView
+    private lateinit var konfettiView : KonfettiView
+    private lateinit var pieChart : PieChart
+    private lateinit var btnViewGoalsProgress : Button
+    private lateinit var btnBack : Button
+    private lateinit var btnShowBarGraph:Button
 
-    private val goal = 15000.0  // No longer used for progress bar
+    private val goal = 15000.0
 
     override fun onCreateView(
         inflater: android.view.LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        val btnShowBarGraph = view.findViewById<Button>(R.id.btnShowBarGraph)
+
+        btnShowBarGraph.setOnClickListener {
+            val intent = android.content.Intent(requireContext(), ExpenseBarGraphActivity::class.java)
+            startActivity(intent)
+        }
 
         userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
@@ -57,6 +79,19 @@ class HomeFragment : Fragment() {
         tvNextRankLabel = view.findViewById(R.id.tvNextRankLabel)
         ivRankImage = view.findViewById(R.id.ivRankImage)
         konfettiView = view.findViewById(R.id.konfettiView)
+        btnViewGoalsProgress = view.findViewById(R.id.btnViewGoalsProgress)
+        val ivInfoRank = view.findViewById<ImageView>(R.id.questionIcon)
+        ivInfoRank.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("How Ranking Works")
+                .setMessage(
+                    "Your rank is based on the number of points earned while capturing income and expense removes points.\n" +
+                            "Points are earned by budgeting wisely!"
+                )
+                .setPositiveButton("OK", null)
+                .show()
+        }
+        pieChart = view.findViewById(R.id.pieChart)
 
         ivRankImage.setOnClickListener {
             konfettiView.start(
@@ -75,6 +110,13 @@ class HomeFragment : Fragment() {
                     position = Position.Relative(0.5, 0.85) // Lower on the screen
                 )
             )
+        }
+
+        btnViewGoalsProgress.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, GProgressFragment())
+                .addToBackStack(null)
+                .commit()
         }
 
         listenToFinanceChanges()
@@ -169,5 +211,51 @@ class HomeFragment : Fragment() {
         val categoryMap = finances.groupingBy { it.name }.eachCount()
         val mostFrequent = categoryMap.maxByOrNull { it.value }?.key ?: "None"
         tvFrequentCategory.text = mostFrequent
+
+        // Only use expense entries for pie chart
+        val expenseCategories = finances
+            .filter { it.type == "expense" }
+            .groupingBy { it.name }
+            .fold(0.0) { acc, item -> acc + item.amount }
+
+        if (expenseCategories.isNotEmpty()) {
+            val entries = expenseCategories.map { (category, amount) ->
+                PieEntry(amount.toFloat(), category)
+            }
+
+            val dataSet = PieDataSet(entries, "")
+            dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+            dataSet.sliceSpace = 3f
+            dataSet.valueTextSize = 12f
+            dataSet.setDrawValues(true)
+
+            val data = PieData(dataSet)
+            data.setValueFormatter(PercentFormatter(pieChart)) //show % only
+            pieChart.data = data
+            pieChart.description.isEnabled = false
+            pieChart.centerText = "Spending Breakdown"
+            pieChart.setDrawEntryLabels(false)
+            pieChart.setUsePercentValues(true)
+            pieChart.animateY(1000)
+            pieChart.invalidate()
+            data.setValueFormatter(PercentFormatter(pieChart))
+            data.setValueTextSize(12f)
+
+            val legend = pieChart.legend
+            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+            legend.orientation = Legend.LegendOrientation.HORIZONTAL
+            legend.setDrawInside(false)
+            legend.isWordWrapEnabled = true
+            legend.textSize = 10f
+            legend.xEntrySpace = 12f
+            legend.yEntrySpace = 15f
+            legend.isWordWrapEnabled = true
+
+        } else {
+            pieChart.clear()
+            pieChart.centerText = "No expenses yet"
+        }
+
     }
 }

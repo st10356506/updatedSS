@@ -91,6 +91,36 @@
                         android:textStyle="bold"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="10dp" />
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp" />
+                    <Button
+                        android:id="@+id/btnShowBarGraph"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="24dp"
+                        android:text="Show Expense Bar Graph"
+                        android:backgroundTint="#000000"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:elevation="4dp"/>
+
+
+                    <Button
+                        android:id="@+id/btnViewGoalsProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="24dp"
+                        android:text="Goals Progress"
+                        android:backgroundTint="#000000"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:elevation="4dp" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -171,6 +201,16 @@
                             android:background="@drawable/progress_gradient"/>
                     </FrameLayout>
 
+                    <ImageView
+                        android:id="@+id/questionIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/info"
+                        android:contentDescription="Info"
+                        android:padding="4dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
                     <TextView
                         android:id="@+id/tvProgressText"
                         android:layout_width="wrap_content"
@@ -246,52 +286,6 @@
                                 android:layout_marginTop="4dp"/>
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@drawable/rounded_card"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginRight="6dp"
-                    android:elevation="5dp"
-                    android:padding="18dp"
-                    android:layout_marginBottom="20dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Total Budget:"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/totalBudgetTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@color/dark_green"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Recent Expenses"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/black" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

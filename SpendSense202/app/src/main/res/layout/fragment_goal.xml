@@ -120,6 +120,17 @@
             </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tvYourRewards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enter Spending Range"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:padding="8dp" />
+
         <!-- Min/Max Input -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -134,6 +145,17 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center">
+                <EditText
+                    android:id="@+id/editTextMaxInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:textAlignment="center"
+                    android:textColorHint="@color/black"
+                    android:hint="Max"
+                    android:inputType="number"
+                    android:layout_marginStart="16dp" />
 
                 <EditText
                     android:id="@+id/editTextMinInput"
@@ -142,17 +164,9 @@
                     android:layout_weight="1"
                     android:textColor="@color/black"
                     android:hint="Min"
+                    android:textAlignment="center"
+                    android:textColorHint="@color/black"
                     android:inputType="number" />
-
-                <EditText
-                    android:id="@+id/editTextMaxInput"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:hint="Max"
-                    android:inputType="number"
-                    android:layout_marginStart="16dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

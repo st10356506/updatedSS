@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(frag: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frameLayout, frag)
+            .replace(R.id.fragment_container, frag)
             .commit()
     }
 }

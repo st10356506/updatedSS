@@ -273,7 +273,7 @@ class GoalFragment : Fragment() {
     private fun observeGoals() {
         viewModel.allGoals.observe(viewLifecycleOwner) { goalWithIdList ->
             val goalList = goalWithIdList.map { it.goal }
-            goalAdapter.updateGoals(goalList) // ✅ Now it's List<Goal>
+            goalAdapter.updateGoals(goalList) //
         }
     }
 

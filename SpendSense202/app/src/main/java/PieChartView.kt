@@ -29,11 +29,11 @@ class PieChartView(context: Context, attrs: AttributeSet?) : View(context, attrs
     private val rectF = RectF()
 
     private val expenses = mapOf(
-        "Rent" to 5000f,
-        "Groceries" to 2000f,
+        "Food" to 5000f,
+        "Bills" to 2000f,
         "Transport" to 1000f,
-        "Entertainment" to 1500f,
-        "Utilities" to 800f
+        "Shopping" to 1500f,
+        "Other" to 1200f
     )
 
     private val colors = listOf(

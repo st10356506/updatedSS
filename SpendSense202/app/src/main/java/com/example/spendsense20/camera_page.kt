@@ -126,10 +126,6 @@ class CameraPage : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        binding.btnUpload.setOnClickListener {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
-
         binding.btnCapture.setOnClickListener {
             imageUri = createImageUri()
             takePicture.launch(imageUri)
