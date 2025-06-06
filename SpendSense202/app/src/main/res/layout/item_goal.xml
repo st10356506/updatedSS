@@ -14,24 +14,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvGoalName"
+        <ImageButton
+            android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Goal Name"
-            android:textColor="#212121"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:fontFamily="sans-serif-medium" />
-
-        <TextView
-            android:id="@+id/tvGoalAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Target: R1000"
-            android:textColor="#424242"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete"
+            android:src="@drawable/baseline_delete_24"
+            />
 
         <TextView
             android:id="@+id/tvGoalCategory"
@@ -43,19 +36,36 @@
             android:layout_marginTop="4dp" />
 
         <TextView
-            android:id="@+id/tvGoalDate"
+            android:id="@+id/tvStartGoalDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Due: 01 Jan 2025"
+            android:text="Start Date: 01 Jan 2025"
+            android:textColor="#424242"
+            android:textSize="16sp"
+            android:layout_marginTop="2dp" />
+        <TextView
+            android:id="@+id/tvEndGoalDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End Date: 01 Jan 2025"
             android:textColor="#424242"
             android:textSize="16sp"
             android:layout_marginTop="2dp" />
 
         <TextView
-            android:id="@+id/tvMonthlyContribution"
+            android:id="@+id/tvMinMonthlyContribution"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Monthly: R500"
+            android:text="Min: R500"
+            android:textColor="#424242"
+            android:textSize="16sp"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:id="@+id/tvMaxMonthlyContribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Max: R1000"
             android:textColor="#424242"
             android:textSize="16sp"
             android:layout_marginTop="2dp" />

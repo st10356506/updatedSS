@@ -18,8 +18,7 @@
         app:menu ="@menu/bottom_nav_view"
         app:itemRippleColor="#4CAF50"
         app:itemTextColor="#4CAF50"
-        app:itemIconTint="#4caf50"
-        />
+        app:itemIconTint="#4caf50" />
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="0dp"

@@ -1,10 +1,10 @@
 package com.example.spendsense20.data
 
 data class Goal(
-    var name: String = "",
-    var amount: Int = 0,
+    var id: String="",
     var category: String ="",
-    var targetDate: String = "",
+    var startDate: String = "",
+    var endDate: String = "",
     var minContribution: Int = 0,
     var maxContribution: Int = 0
 )

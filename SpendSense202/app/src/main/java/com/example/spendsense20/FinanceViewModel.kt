@@ -1,6 +1,7 @@
 package com.example.spendsense20
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,6 +25,16 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
         val id = databaseRef.push().key ?: return
         finance.id = id
         databaseRef.child(id).setValue(finance)
+    }
+
+    fun deleteFinance(id: String) {
+        databaseRef.child(id).removeValue()
+            .addOnSuccessListener {
+                Log.d("FinanceViewModel", "Successfully deleted finance entry with ID: $id")
+            }
+            .addOnFailureListener {
+                Log.e("FinanceViewModel", "Failed to delete finance entry: ${it.message}")
+            }
     }
 
     // Observe finances for a specific date under current user

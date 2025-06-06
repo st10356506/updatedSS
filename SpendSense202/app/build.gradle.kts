@@ -88,5 +88,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation ("com.google.android.material:material:1.11.0")
+    implementation("nl.dionsegijn:konfetti-xml:2.0.5")
+    implementation ("com.google.android.material:material:1.11.0")
 
 }

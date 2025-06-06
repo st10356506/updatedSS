@@ -14,6 +14,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import androidx.core.content.ContextCompat
 
 class AddFragment : Fragment() {
 
@@ -41,13 +45,22 @@ class AddFragment : Fragment() {
         _binding = FragmentAddBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val saveButton = binding.saveBalanceButton
+
         val editButton = binding.editBalanceButton
 
         val totalBalanceTextView = binding.totalBalanceTextView
 
-        val balanceSeekBar = binding.balanceSeekBar
+
         val balanceEditText = binding.balanceEditText
+        binding.btnAllExpenses.setOnClickListener {
+            val intent = Intent(requireContext(), AllExpensesActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnAllIncome.setOnClickListener {
+            val intent = Intent(requireContext(), AllIncomeActivity::class.java)
+            startActivity(intent)
+        }
 
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
@@ -59,13 +72,13 @@ class AddFragment : Fragment() {
         databaseRef = FirebaseDatabase.getInstance().getReference("finances").child(userId)
 
         setEditingEnabled(false)
-        saveButton.visibility = View.GONE
+
         editButton.visibility = View.GONE
 
         databaseRef.child("balance").get().addOnSuccessListener { balanceSnapshot ->
             val balance = balanceSnapshot.getValue(Int::class.java) ?: 0
             totalBalanceTextView.text = "R$balance"
-            balanceSeekBar.progress = balance
+
             balanceEditText.setText(balance.toString())
 
             databaseRef.child("budget_editable").get().addOnSuccessListener { editSnapshot ->
@@ -80,64 +93,23 @@ class AddFragment : Fragment() {
         }.addOnFailureListener {
             Log.e("AddFragment", "Failed to get balance from Firebase: ${it.message}")
             totalBalanceTextView.text = "R0"
-            balanceSeekBar.progress = 0
+
             balanceEditText.setText("0")
             isEditing = true
             updateUIEditingState(isEditing)
         }
 
-        balanceSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                totalBalanceTextView.text = "R$progress"
-                if (isEditing) {
-                    balanceEditText.setText(progress.toString())
-                }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
-        saveButton.setOnClickListener {
-            val manualInput = balanceEditText.text.toString().toIntOrNull()
-            if (manualInput == null) {
-                Toast.makeText(requireContext(), "Please enter a valid number", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val newBalance = manualInput
-
-            totalBalanceTextView.text = "R$newBalance"
-            balanceSeekBar.progress = newBalance
-
-            setEditingEnabled(false)
-
-            val updates = mapOf(
-                "balance" to newBalance,
-                "budget_editable" to false
-            )
-            databaseRef.updateChildren(updates).addOnFailureListener {
-                Log.e("AddFragment", "Failed to save balance/edit state: ${it.message}")
-                Toast.makeText(requireContext(), "Failed to save data", Toast.LENGTH_SHORT).show()
-            }
-
-            isEditing = false
-            updateUIEditingState(false)
-        }
-
-
-        val recyclerViewIncome = binding.recyclerViewIncome
-        val recyclerViewExpense = binding.recyclerViewExpense
         val recyclerViewFiltered = binding.recyclerViewFilteredExpenses
 
         adapterIncome = createFinanceAdapter()
         adapterExpense = createFinanceAdapter()
         adapterFiltered = createFinanceAdapter()
 
-        recyclerViewIncome.adapter = adapterIncome
-        recyclerViewExpense.adapter = adapterExpense
+
         recyclerViewFiltered.adapter = adapterFiltered
 
-        recyclerViewIncome.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewExpense.layoutManager = LinearLayoutManager(requireContext())
+
         recyclerViewFiltered.layoutManager = LinearLayoutManager(requireContext())
 
         databaseRef.addValueEventListener(object : ValueEventListener {
@@ -161,15 +133,8 @@ class AddFragment : Fragment() {
                 val calculatedBalanceInt = calculatedBalance.toInt()
 
                 totalBalanceTextView.text = "R$calculatedBalanceInt"
-                balanceSeekBar.progress = calculatedBalanceInt.coerceIn(0, balanceSeekBar.max)
-                if (isEditing) {
-                    balanceEditText.setText(calculatedBalanceInt.toString())
-                }
-
                 refreshAdapters()
             }
-
-
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("AddFragment", "Database error: ${error.message}")
@@ -210,8 +175,45 @@ class AddFragment : Fragment() {
                 }.groupBy { it.name }
                     .mapValues { (_, entries) -> entries.sumOf { it.amount } }
 
-                val summaryText = summary.entries.joinToString("\n") { "${it.key}: R${it.value}" }
-                binding.tvCategorySummary.text = if (summaryText.isNotBlank()) summaryText else "No category totals found in the selected period."
+                val summaryBuilder = SpannableStringBuilder()
+
+                val blackColor = ContextCompat.getColor(requireContext(), android.R.color.black)
+                val redColor = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
+
+                summary.entries.forEach { (category, total) ->
+                    val line = "$category: R$total\n"
+                    val startAmount = line.indexOf("R")
+                    val endAmount = line.length
+
+                    val startCategory = 0
+                    val endCategory = startAmount
+
+                    // Append full line first
+                    val startIndex = summaryBuilder.length
+                    summaryBuilder.append(line)
+
+                    // Color category name black
+                    summaryBuilder.setSpan(
+                        ForegroundColorSpan(blackColor),
+                        startIndex + startCategory,
+                        startIndex + endCategory,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+
+                    // Color amount red
+                    summaryBuilder.setSpan(
+                        ForegroundColorSpan(redColor),
+                        startIndex + startAmount,
+                        startIndex + endAmount,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+
+                if (summaryBuilder.isNotEmpty()) {
+                    binding.tvCategorySummary.text = summaryBuilder
+                } else {
+                    binding.tvCategorySummary.text = "No category totals found in the selected period."
+                }
                 binding.tvCategorySummary.visibility = View.VISIBLE
                 recyclerViewFiltered.visibility = View.VISIBLE
 
@@ -257,14 +259,14 @@ class AddFragment : Fragment() {
     }
 
     private fun setEditingEnabled(enabled: Boolean) {
-        binding.balanceSeekBar.isEnabled = enabled
+
         binding.balanceEditText.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     private fun updateUIEditingState(editing: Boolean) {
-        binding.balanceSeekBar.isEnabled = editing
+
         binding.balanceEditText.visibility = if (editing) View.VISIBLE else View.GONE
-        binding.saveBalanceButton.visibility = if (editing) View.VISIBLE else View.GONE
+
         binding.editBalanceButton.visibility = if (editing) View.GONE else View.VISIBLE
     }
 

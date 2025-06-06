@@ -92,7 +92,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
 
-            <!-- ✅ Date under Description -->
+            <!-- Date under Description -->
             <TextView
                 android:id="@+id/textViewDate"
                 android:layout_width="match_parent"

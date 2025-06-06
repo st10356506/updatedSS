@@ -2,13 +2,10 @@ package com.example.spendsense20
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.SeekBar
-import android.widget.Toast
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +13,7 @@ import com.example.spendsense20.data.Goal
 import com.example.spendsense20.adapter.GoalAdapter
 import com.example.spendsense20.databinding.FragmentGoalBinding
 import com.example.spendsense20.viewmodel.GoalViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,7 +23,7 @@ class GoalFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val seekBarMinLimit = 10
-    private val seekBarMaxLimit = 1000000
+    private val seekBarMaxLimit = 100000
 
     private var minContribution = seekBarMinLimit
     private var maxContribution = seekBarMaxLimit
@@ -33,7 +31,8 @@ class GoalFragment : Fragment() {
     private lateinit var goalAdapter: GoalAdapter
     private lateinit var viewModel: GoalViewModel
 
-    private var selectedDate: String = ""
+    private var startDate: String = ""
+    private var endDate: String = ""
     private var selectedCategory: String = ""
 
     override fun onCreateView(
@@ -41,68 +40,72 @@ class GoalFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGoalBinding.inflate(inflater, container, false)
-
         viewModel = ViewModelProvider(this)[GoalViewModel::class.java]
 
         setupCategoryDropdown()
         setupSeekBars()
-        setupDatePicker()
-        setupRecyclerView()
+        setupEditTextListeners()
+        setupDatePickers()
+        setupRecyclerView()  // Initialize RecyclerView
         setupAddGoalButton()
-        observeGoals()
+        observeGoals()  // Observe goals from ViewModel
 
         return binding.root
     }
 
     private fun setupCategoryDropdown() {
-        val categories = listOf("Food", "Transport", "Bills", "Shopping", "Salary", "Cheque", "Investments", "Bonus", "Other")
-
-        val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        binding.spinnerCategory.adapter = categoryAdapter
+        val categories = listOf("Food", "Transport", "Bills", "Shopping", "Other")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selected = parent.getItemAtPosition(position).toString()
-                selectedCategory = selected
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                binding.editCustomCategory.visibility =
+                    if (categories[position] == "Other") View.VISIBLE else View.GONE
+            }
 
-                // Show custom input if "Other" is selected
-                binding.editCustomCategory.visibility = if (selected == "Other") View.VISIBLE else View.GONE
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.spinnerCategory.adapter = adapter
+        binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                selectedCategory = parent.getItemAtPosition(position).toString()
+                binding.editCustomCategory.visibility =
+                    if (selectedCategory == "Other") View.VISIBLE else View.GONE
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                // Optional: Reset category
                 selectedCategory = ""
             }
         }
     }
 
-
-    private fun observeGoals() {
-        viewModel.allGoals.observe(viewLifecycleOwner) { goals ->
-            goalAdapter.updateGoals(goals)
-        }
-    }
-
     private fun setupSeekBars() {
         val range = seekBarMaxLimit - seekBarMinLimit
-        binding.seekBarMin.max = range
-        binding.seekBarMax.max = range
+        binding.seekBarMin.max = range / 10
+        binding.seekBarMax.max = range / 10
 
-        binding.seekBarMin.progress = minContribution - seekBarMinLimit
-        binding.seekBarMax.progress = maxContribution - seekBarMinLimit
+        binding.seekBarMin.progress = (minContribution - seekBarMinLimit) / 10
+        binding.seekBarMax.progress = (maxContribution - seekBarMinLimit) / 10
+
+        binding.editTextMinInput.setText(minContribution.toString())
+        binding.editTextMaxInput.setText(maxContribution.toString())
 
         updateRangeText()
 
         binding.seekBarMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                minContribution = progress + seekBarMinLimit
-                if (minContribution > maxContribution) {
-                    minContribution = maxContribution
-                    binding.seekBarMin.progress = minContribution - seekBarMinLimit
+                if (fromUser) {
+                    minContribution = seekBarMinLimit + (progress * 10)
+                    if (minContribution > maxContribution) {
+                        maxContribution = minContribution
+                        binding.seekBarMax.progress = (maxContribution - seekBarMinLimit) / 10
+                        binding.editTextMaxInput.setText(maxContribution.toString())
+                    }
+                    binding.editTextMinInput.setText(minContribution.toString())
+                    updateRangeText()
                 }
-                updateRangeText()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -111,12 +114,16 @@ class GoalFragment : Fragment() {
 
         binding.seekBarMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                maxContribution = progress + seekBarMinLimit
-                if (maxContribution < minContribution) {
-                    maxContribution = minContribution
-                    binding.seekBarMax.progress = maxContribution - seekBarMinLimit
+                if (fromUser) {
+                    maxContribution = seekBarMinLimit + (progress * 10)
+                    if (maxContribution < minContribution) {
+                        minContribution = maxContribution
+                        binding.seekBarMin.progress = (minContribution - seekBarMinLimit) / 10
+                        binding.editTextMinInput.setText(minContribution.toString())
+                    }
+                    binding.editTextMaxInput.setText(maxContribution.toString())
+                    updateRangeText()
                 }
-                updateRangeText()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -124,82 +131,150 @@ class GoalFragment : Fragment() {
         })
     }
 
+    private fun setupEditTextListeners() {
+        binding.editTextMinInput.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val input = s?.toString()?.toIntOrNull()
+                if (input != null) {
+                    minContribution = input.coerceIn(seekBarMinLimit, seekBarMaxLimit)
+                    if (minContribution > maxContribution) {
+                        maxContribution = minContribution
+                        binding.editTextMaxInput.setText(maxContribution.toString())
+                        binding.seekBarMax.progress = (maxContribution - seekBarMinLimit) / 10
+                    }
+                    binding.seekBarMin.progress = (minContribution - seekBarMinLimit) / 10
+                    updateRangeText()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        binding.editTextMaxInput.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val input = s?.toString()?.toIntOrNull()
+                if (input != null) {
+                    maxContribution = input.coerceIn(seekBarMinLimit, seekBarMaxLimit)
+                    if (maxContribution < minContribution) {
+                        minContribution = maxContribution
+                        binding.editTextMinInput.setText(minContribution.toString())
+                        binding.seekBarMin.progress = (minContribution - seekBarMinLimit) / 10
+                    }
+                    binding.seekBarMax.progress = (maxContribution - seekBarMinLimit) / 10
+                    updateRangeText()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
+    private fun setupDatePickers() {
+        val calendar = Calendar.getInstance()
+
+        binding.btnStartPickDate.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, year, month, day ->
+                calendar.set(year, month, day)
+                val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                startDate = sdf.format(calendar.time)
+                binding.startDateText.text = startDate
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        binding.btnEndPickDate.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, year, month, day ->
+                calendar.set(year, month, day)
+                val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                endDate = sdf.format(calendar.time)
+                binding.endDateText.text = endDate
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+    }
+
     private fun updateRangeText() {
         binding.currentRangeText.text = "Range: R$minContribution - R$maxContribution"
     }
 
-    private fun setupDatePicker() {
-        val calendar = Calendar.getInstance()
-        binding.btnPickDate.setOnClickListener {
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-            DatePickerDialog(requireContext(), { _, y, m, d ->
-                calendar.set(y, m, d)
-                val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                selectedDate = sdf.format(calendar.time)
-                binding.selectedDateText.text = selectedDate
-            }, year, month, day).show()
-        }
-    }
-
     private fun setupRecyclerView() {
-        goalAdapter = GoalAdapter(emptyList())
+        goalAdapter = GoalAdapter(goals = listOf(), deleteGoal = { goal ->
+            // Call deleteGoal with the goal's ID when deleting
+            deleteGoal(goal.id)  // Pass goal.id or goal directly based on your implementation
+        })
         binding.goalsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.goalsRecyclerView.adapter = goalAdapter
     }
 
     private fun setupAddGoalButton() {
         binding.btnAddGoal.setOnClickListener {
-            val name = binding.inputGoalName.text.toString().trim()
-            val amountStr = binding.inputGoalAmount.text.toString().trim()
-
-            if (name.isEmpty() || amountStr.isEmpty() || selectedDate.isEmpty() || selectedCategory.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val amount = amountStr.toIntOrNull()
-            if (amount == null) {
-                Toast.makeText(requireContext(), "Enter a valid amount.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val goal = Goal(
-                name = name,
-                amount = amount,
-                targetDate = selectedDate,
-                category = selectedCategory,
-                minContribution = minContribution,
-                maxContribution = maxContribution
-            )
-
-            viewModel.insertGoal(goal)
-            clearInputs()
-
-            val category = if (binding.editCustomCategory.visibility == View.VISIBLE &&
-                binding.editCustomCategory.text.isNotBlank()) {
+            val finalCategory = if (binding.editCustomCategory.visibility == View.VISIBLE &&
+                binding.editCustomCategory.text.isNotBlank()
+            ) {
                 binding.editCustomCategory.text.toString()
             } else {
                 selectedCategory
             }
 
+            if (finalCategory.isBlank() || startDate.isBlank() || endDate.isBlank()) {
+                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Get current user ID
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId.isNullOrBlank()) {
+                Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // ✅ Attach userId to goal
+            val goal = Goal(
+                startDate = startDate,
+                endDate = endDate,
+                category = finalCategory,
+                minContribution = minContribution,
+                maxContribution = maxContribution,
+                id = userId
+            )
+
+            viewModel.insertGoal(goal)
+            Toast.makeText(requireContext(), "Goal saved!", Toast.LENGTH_SHORT).show()
+            clearInputs()
         }
+    }
+
+
+    private fun deleteGoal(goalId: String) {
+        viewModel.deleteGoal(goalId)  // Deleting goal by ID
+        Toast.makeText(requireContext(), "Goal deleted!", Toast.LENGTH_SHORT).show()
     }
 
     private fun clearInputs() {
         minContribution = seekBarMinLimit
         maxContribution = seekBarMaxLimit
-        binding.seekBarMin.progress = minContribution - seekBarMinLimit
-        binding.seekBarMax.progress = maxContribution - seekBarMinLimit
-        binding.inputGoalName.text?.clear()
-        binding.inputGoalAmount.text?.clear()
-        binding.spinnerCategory.setSelection(0)
+
+        binding.editTextMinInput.setText(minContribution.toString())
+        binding.editTextMaxInput.setText(maxContribution.toString())
+        binding.seekBarMin.progress = (minContribution - seekBarMinLimit) / 10
+        binding.seekBarMax.progress = (maxContribution - seekBarMinLimit) / 10
+        binding.currentRangeText.text = "Range: R$minContribution - R$maxContribution"
+
+        startDate = ""
+        endDate = ""
         selectedCategory = ""
-        binding.selectedDateText.text = ""
-        selectedDate = ""
-        updateRangeText()
+        binding.spinnerCategory.setSelection(0)
+        binding.editCustomCategory.setText("")
+        binding.editCustomCategory.visibility = View.GONE
+        binding.startDateText.text = ""
+        binding.endDateText.text = ""
+    }
+
+    private fun observeGoals() {
+        viewModel.allGoals.observe(viewLifecycleOwner) { goalWithIdList ->
+            val goalList = goalWithIdList.map { it.goal }
+            goalAdapter.updateGoals(goalList) // ✅ Now it's List<Goal>
+        }
     }
 
     override fun onDestroyView() {

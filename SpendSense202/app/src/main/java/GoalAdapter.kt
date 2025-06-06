@@ -3,19 +3,23 @@ package com.example.spendsense20.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.spendsense20.R
 import com.example.spendsense20.data.Goal
 
-class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdapter.GoalViewHolder>() {
+class GoalAdapter(private var goals: List<Goal>, private val deleteGoal: (Goal) -> Unit) :
+    RecyclerView.Adapter<GoalAdapter.GoalViewHolder>() {
 
     inner class GoalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val goalName: TextView = itemView.findViewById(R.id.tvGoalName)
-        val goalAmount: TextView = itemView.findViewById(R.id.tvGoalAmount)
         val category: TextView = itemView.findViewById(R.id.tvGoalCategory)
-        val goalDate: TextView = itemView.findViewById(R.id.tvGoalDate)
-        val monthlyContribution: TextView = itemView.findViewById(R.id.tvMonthlyContribution)
+        val goalStartDate: TextView = itemView.findViewById(R.id.tvStartGoalDate)
+        val goalEndDate: TextView = itemView.findViewById(R.id.tvEndGoalDate)
+        val MinContribution: TextView = itemView.findViewById(R.id.tvMinMonthlyContribution)
+        val MaxContribution: TextView = itemView.findViewById(R.id.tvMaxMonthlyContribution)
+        val deleteButton: ImageButton = itemView.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GoalViewHolder {
@@ -26,12 +30,17 @@ class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdap
 
     override fun onBindViewHolder(holder: GoalViewHolder, position: Int) {
         val goal = goals[position]
-        holder.goalName.text = goal.name
-        holder.goalAmount.text = "Target: R${goal.amount}"
         holder.category.text = "Category: ${goal.category}"
-        holder.goalDate.text = "Due: ${goal.targetDate}"
-        holder.monthlyContribution.text =
-            "Contribution: R${goal.minContribution} - R${goal.maxContribution}"
+        holder.goalStartDate.text = "Start Date: ${goal.startDate}"
+        holder.goalEndDate.text = "End Date: ${goal.endDate}"
+        holder.MinContribution.text = "Contribution: R${goal.minContribution}"
+        holder.MaxContribution.text = "Contribution: R${goal.maxContribution}"
+
+        // Set up the delete button click listener
+        holder.deleteButton.setOnClickListener {
+            // Trigger the delete action passed from the Fragment or Activity
+            deleteGoal(goal)
+        }
     }
 
     override fun getItemCount(): Int = goals.size
@@ -40,4 +49,5 @@ class GoalAdapter(private var goals: List<Goal>) : RecyclerView.Adapter<GoalAdap
         this.goals = newGoals
         notifyDataSetChanged()
     }
+
 }

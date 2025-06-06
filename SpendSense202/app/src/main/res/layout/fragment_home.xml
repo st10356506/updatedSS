@@ -1,4 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -6,106 +6,108 @@
     android:background="#EFECE7"
     tools:context=".MainActivity">
 
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:background="@android:color/white">
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/header_gradient_background"
-                android:padding="24dp"
-                android:text="Home Page"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:elevation="6dp" />
-
-            <TextView
-                android:id="@+id/mainHeading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your Budget at a Glance"
-                android:textColor="@android:color/black"
-                android:textAlignment="center"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/currentDateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:layout_gravity="center"
-                android:textColor="#000000"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginBottom="20dp" />
-
-            <!-- Total Balance Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
-                android:background="@drawable/rounded_card"
-                android:elevation="5dp"
                 android:padding="20dp"
-                android:layout_marginBottom="20dp">
+                android:backgroundTint="#EFECE7">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Total Balance"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
+                    android:background="@drawable/header_gradient_background"
+                    android:padding="24dp"
+                    android:text="Home Page"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
                     android:textStyle="bold"
-                    android:layout_gravity="center_horizontal" />
+                    android:elevation="6dp" />
 
                 <TextView
-                    android:id="@+id/totalBalanceTextView"
+                    android:id="@+id/mainHeading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Your Budget at a Glance"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/currentDateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="@color/dark_green"
-                    android:textSize="34sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp" />
-            </LinearLayout>
-
-            <!-- Rewards Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginBottom="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rewards Progress"
+                    android:layout_gravity="center"
                     android:textColor="#000000"
-                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="20dp"/>
+                    android:textSize="16sp"
+                    android:layout_marginBottom="20dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/rounded_card"
+                    android:elevation="5dp"
+                    android:padding="20dp"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Balance"
+                        android:textColor="@android:color/black"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center_horizontal" />
+
+                    <TextView
+                        android:id="@+id/totalBalanceTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/dark_green"
+                        android:textSize="34sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rewards Progress"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="20dp"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -129,7 +131,6 @@
                             android:fontFamily="sans-serif-medium"
                             android:textStyle="bold"/>
 
-                        <!-- RANK IMAGE -->
                         <ImageView
                             android:id="@+id/ivRankImage"
                             android:layout_width="80dp"
@@ -149,178 +150,159 @@
                             android:layout_marginTop="4dp"/>
                     </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvNextRankLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Progress to Platinum"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="12dp"/>
+                    <TextView
+                        android:id="@+id/tvNextRankLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Progress to Platinum"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp"/>
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="16dp"
-                    android:background="@drawable/progress_background">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="16dp"
+                        android:background="@drawable/progress_background">
 
-                    <View
-                        android:id="@+id/progressBarFill"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/progress_gradient"/>
-                </FrameLayout>
+                        <View
+                            android:id="@+id/progressBarFill"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/progress_gradient"/>
+                    </FrameLayout>
 
-                <TextView
-                    android:id="@+id/tvProgressText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"/>
+                    <TextView
+                        android:id="@+id/tvProgressText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tvFrequentCategory"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="@color/black"
+                                android:textSize="24sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Frequent Category"
+                                android:textColor="#757575"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:background="#E0E0E0"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tvPointsEarned"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="@color/black"
+                                android:textSize="24sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Points Earned"
+                                android:textColor="#757575"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center">
+                    android:background="@drawable/rounded_card"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp"
+                    android:elevation="5dp"
+                    android:padding="18dp"
+                    android:layout_marginBottom="20dp">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:text="Total Budget:"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp" />
 
-                        <TextView
-                            android:id="@+id/tvFrequentCategory"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textColor="@color/black"
-                            android:textSize="24sp"
-                            android:fontFamily="sans-serif-medium"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Frequent Category"
-                            android:textColor="#757575"
-                            android:textSize="14sp"
-                            android:layout_marginTop="4dp"/>
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="40dp"
-                        android:background="#E0E0E0"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/totalBudgetTextView"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/tvPointsEarned"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=""
-                            android:textColor="@color/black"
-                            android:textSize="24sp"
-                            android:fontFamily="sans-serif-medium"
-                            android:textStyle="bold"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Points Earned"
-                            android:textColor="#757575"
-                            android:textSize="14sp"
-                            android:layout_marginTop="4dp"/>
-                    </LinearLayout>
+                        android:text=""
+                        android:textColor="@color/dark_green"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
-            </LinearLayout>
 
-            <!-- Budget Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_card"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
-                android:elevation="5dp"
-                android:padding="18dp"
-                android:layout_marginBottom="20dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Total Budget:"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/totalBudgetTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/dark_green"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Recent Expenses -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Recent Expenses"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/expenseCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_card"
-                android:elevation="6dp"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:gravity="center"
-                android:layout_margin="10dp">
-
-                <TextView
-                    android:id="@+id/tvExpenseHeader"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Expenses"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewExpense"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Recent Expenses"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Konfetti overlay on top of rank card and entire layout -->
+    <nl.dionsegijn.konfetti.xml.KonfettiView
+        android:id="@+id/konfettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
+</FrameLayout>

@@ -62,6 +62,9 @@
         <activity android:name=".CalculatorPage" />
         <activity android:name=".ImageViewActivity" />
 
+        <activity android:name=".AllExpensesActivity" />
+        <activity android:name=".AllIncomeActivity" />
+
     </application>
 
 </manifest>
