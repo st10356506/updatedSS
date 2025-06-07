@@ -126,13 +126,21 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp">
 
+                        <nl.dionsegijn.konfetti.xml.KonfettiView
+                            android:id="@+id/konfettiView"
+                            android:layout_width="141dp"
+                            android:layout_height="127dp"
+                            android:layout_gravity="center"
+                            android:visibility="visible" />
+
                         <ImageView
                             android:id="@+id/ivRankBadge"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
+                            android:layout_gravity="center"
                             android:contentDescription="Rank Badge"
-                            android:src="@drawable/bronze"
-                            android:elevation="8dp" />
+                            android:elevation="8dp"
+                            android:src="@drawable/bronze" />
                     </FrameLayout>
 
                     <TextView

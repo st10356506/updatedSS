@@ -6,9 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@android:color/white">
-
-    <!-- Back Button -->
+    android:background="#EFECE7">
 
     <!-- Title -->
     <TextView
@@ -30,11 +28,15 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingTop="8dp"/>
+
     <Button
         android:id="@+id/btnBackExpenses"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginBottom="30dp"
         android:backgroundTint="@color/black"
-        android:text="← Back" />
+        android:textColor="#ffffff"
+        android:text="Back" />
 
 </LinearLayout>

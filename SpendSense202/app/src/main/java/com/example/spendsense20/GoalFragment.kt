@@ -55,7 +55,7 @@ class GoalFragment : Fragment() {
 
     private fun setupCategoryDropdown() {
         val categories = listOf("Food", "Transport", "Bills", "Shopping", "Other")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         binding.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -228,7 +228,7 @@ class GoalFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // ✅ Attach userId to goal
+            // Attach userId to goal
             val goal = Goal(
                 startDate = startDate,
                 endDate = endDate,

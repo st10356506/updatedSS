@@ -37,6 +37,13 @@ class AddFragment : Fragment() {
     private var isEditing: Boolean = true
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+    /**
+     * Google Firebase. (n.d.). *Firebase Realtime Database documentation*. Retrieved June 7, 2025,
+     * from https://firebase.google.com/docs/database
+     *
+     * Android Developers. (n.d.). *Fragments*. Retrieved June 7, 2025,
+     * from https://developer.android.com/guide/fragments
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,13 +52,10 @@ class AddFragment : Fragment() {
         _binding = FragmentAddBinding.inflate(inflater, container, false)
         val view = binding.root
 
-
         val editButton = binding.editBalanceButton
-
         val totalBalanceTextView = binding.totalBalanceTextView
-
-
         val balanceEditText = binding.balanceEditText
+
         binding.btnAllExpenses.setOnClickListener {
             val intent = Intent(requireContext(), AllExpensesActivity::class.java)
             startActivity(intent)
@@ -75,6 +79,7 @@ class AddFragment : Fragment() {
 
         editButton.visibility = View.GONE
 
+        // Firebase Realtime Database call to retrieve balance
         databaseRef.child("balance").get().addOnSuccessListener { balanceSnapshot ->
             val balance = balanceSnapshot.getValue(Int::class.java) ?: 0
             totalBalanceTextView.text = "R$balance"
@@ -87,31 +92,28 @@ class AddFragment : Fragment() {
             }.addOnFailureListener {
                 Log.e("AddFragment", "Failed to get editing state: ${it.message}")
                 isEditing = true
-
             }
 
         }.addOnFailureListener {
             Log.e("AddFragment", "Failed to get balance from Firebase: ${it.message}")
             totalBalanceTextView.text = "R0"
-
             balanceEditText.setText("0")
             isEditing = true
             updateUIEditingState(isEditing)
         }
 
-
         val recyclerViewFiltered = binding.recyclerViewFilteredExpenses
-
         adapterIncome = createFinanceAdapter()
         adapterExpense = createFinanceAdapter()
         adapterFiltered = createFinanceAdapter()
 
-
         recyclerViewFiltered.adapter = adapterFiltered
-
-
         recyclerViewFiltered.layoutManager = LinearLayoutManager(requireContext())
 
+        /**
+         * Google Firebase. (n.d.). *Listen for value events*. Retrieved June 7, 2025,
+         * from https://firebase.google.com/docs/database/android/read-and-write#read_data
+         */
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 allEntries.clear()
@@ -141,6 +143,10 @@ class AddFragment : Fragment() {
             }
         })
 
+        /**
+         * Android Developers. (n.d.). *DatePickerDialog*. Retrieved June 7, 2025,
+         * from https://developer.android.com/reference/android/app/DatePickerDialog
+         */
         binding.btnStartDate.setOnClickListener {
             val cal = Calendar.getInstance()
             DatePickerDialog(requireContext(), { _, year, month, day ->
@@ -157,6 +163,10 @@ class AddFragment : Fragment() {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
+        /**
+         * Android Developers. (n.d.). *SpannableStringBuilder*. Retrieved June 7, 2025,
+         * from https://developer.android.com/reference/android/text/SpannableStringBuilder
+         */
         binding.btnShowSummary.setOnClickListener {
             if (startDate != null && endDate != null) {
                 val start = try { dateFormat.parse(startDate!!) } catch (e: Exception) { null }
@@ -184,15 +194,11 @@ class AddFragment : Fragment() {
                     val line = "$category: R$total\n"
                     val startAmount = line.indexOf("R")
                     val endAmount = line.length
-
                     val startCategory = 0
                     val endCategory = startAmount
-
-                    // Append full line first
                     val startIndex = summaryBuilder.length
                     summaryBuilder.append(line)
 
-                    // Color category name black
                     summaryBuilder.setSpan(
                         ForegroundColorSpan(blackColor),
                         startIndex + startCategory,
@@ -200,7 +206,6 @@ class AddFragment : Fragment() {
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
 
-                    // Color amount red
                     summaryBuilder.setSpan(
                         ForegroundColorSpan(redColor),
                         startIndex + startAmount,
@@ -258,18 +263,17 @@ class AddFragment : Fragment() {
         return view
     }
 
+    // Simple UI toggle logic
     private fun setEditingEnabled(enabled: Boolean) {
-
         binding.balanceEditText.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     private fun updateUIEditingState(editing: Boolean) {
-
         binding.balanceEditText.visibility = if (editing) View.VISIBLE else View.GONE
-
         binding.editBalanceButton.visibility = if (editing) View.GONE else View.VISIBLE
     }
 
+    // Adapter used to populate RecyclerViews
     private fun createFinanceAdapter(): FinanceAdapter {
         return FinanceAdapter(
             onImageClick = { imageUri ->
@@ -289,6 +293,7 @@ class AddFragment : Fragment() {
         adapterIncome.submitList(allEntries.filter { it.type.equals("income", ignoreCase = true) }.toList())
         adapterExpense.submitList(allEntries.filter { it.type.equals("expense", ignoreCase = true) }.toList())
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

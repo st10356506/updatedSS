@@ -85,7 +85,7 @@ class HomeFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("How Ranking Works")
                 .setMessage(
-                    "Your rank is based on the number of points earned while capturing income and expense removes points.\n" +
+                    "Your rank is based on the number of points earned while capturing income. Expenses remove points.\n" +
                             "Points are earned by budgeting wisely!"
                 )
                 .setPositiveButton("OK", null)
@@ -94,11 +94,12 @@ class HomeFragment : Fragment() {
         pieChart = view.findViewById(R.id.pieChart)
 
         ivRankImage.setOnClickListener {
+            konfettiView.visibility = View.VISIBLE
             konfettiView.start(
                 Party(
-                    speed = 10f,
-                    maxSpeed = 30f,
-                    damping = 0.9f,
+                    speed = 30f,
+                    maxSpeed = 50f,
+                    damping = 0.8f,
                     spread = 360,
                     colors = listOf(
                         0xFF006400.toInt(), // Dark green
@@ -107,7 +108,7 @@ class HomeFragment : Fragment() {
                         0xFF7CFC00.toInt()  // Lawn green
                     ),
                     emitter = Emitter(duration = 2, TimeUnit.SECONDS).perSecond(40),
-                    position = Position.Relative(0.5, 0.85) // Lower on the screen
+                    position = Position.Relative(0.5, 0.3)
                 )
             )
         }
@@ -141,7 +142,6 @@ class HomeFragment : Fragment() {
             }
         })
     }
-
     private fun updateUI(finances: List<FinanceEntity>) {
         val income = finances.filter { it.type == "income" }.sumOf { it.amount }
         val expenses = finances.filter { it.type == "expense" }.sumOf { it.amount }
@@ -152,35 +152,30 @@ class HomeFragment : Fragment() {
         val points = (balance / 100).toInt().coerceAtLeast(0)
         tvPointsEarned.text = "$points pts"
 
-        // Determine current rank, next rank threshold, and next rank label
         val (currentRank, nextThreshold, nextRank) = when {
-            points >= 200 -> Triple("Platinum", null, "Max Rank Achieved")
-            points >= 100 -> Triple("Gold", 200, "Platinum")
-            points >= 50 -> Triple("Silver", 100, "Gold")
-            else -> Triple("Bronze", 50, "Silver")
+            points >= 800 -> Triple("Platinum", null, "Max Rank Achieved")
+            points >= 500 -> Triple("Emerald", 800, "Platinum")
+            points >= 250 -> Triple("Gold", 500, "Emerald")
+            points >= 100 -> Triple("Silver", 250, "Gold")
+            else -> Triple("Bronze", 100, "Silver")
         }
 
         tvUserRank.text = currentRank
-        tvNextRankLabel.text = if (nextThreshold != null) {
-            "Progress to $nextRank"
-        } else {
-            "Max Rank Achieved"
-        }
+        tvNextRankLabel.text = nextThreshold?.let { "Progress to $nextRank" } ?: "Max Rank Achieved"
 
-        // Calculate progress toward next rank
         val lowerBound = when (currentRank) {
             "Bronze" -> 0
-            "Silver" -> 50
-            "Gold" -> 100
-            "Platinum" -> 200
+            "Silver" -> 100
+            "Gold" -> 250
+            "Emerald" -> 500
+            "Platinum" -> 800
             else -> 0
         }
 
-        val upperBound = nextThreshold ?: lowerBound // For max rank, progress is full
+        val upperBound = nextThreshold ?: lowerBound
         val range = (upperBound - lowerBound).coerceAtLeast(1)
         val progressRatio = ((points - lowerBound).toDouble() / range).coerceIn(0.0, 1.0)
 
-        // Update progress bar fill width
         progressBarFill.post {
             val parentWidth = (progressBarFill.parent as View).width
             val newWidth = (parentWidth * progressRatio).toInt()
@@ -189,19 +184,15 @@ class HomeFragment : Fragment() {
             progressBarFill.layoutParams = params
         }
 
-        // Update progress text with percent or max rank message
-        if (nextThreshold != null) {
-            val percent = (progressRatio * 100).toInt()
-            tvProgressText.text = "$percent% to $nextRank"
-        } else {
-            tvProgressText.text = "Rank Maxed!"
-        }
+        tvProgressText.text = nextThreshold?.let {
+            "${(progressRatio * 100).toInt()}% to $nextRank"
+        } ?: "Rank Maxed!"
 
-        // Update rank image
         val rankDrawableRes = when (currentRank) {
             "Bronze" -> R.drawable.bronze
             "Silver" -> R.drawable.silver
             "Gold" -> R.drawable.gold
+            "Emerald" -> R.drawable.emerald
             "Platinum" -> R.drawable.platinum
             else -> R.drawable.bronze
         }
@@ -224,7 +215,14 @@ class HomeFragment : Fragment() {
             }
 
             val dataSet = PieDataSet(entries, "")
-            dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+            dataSet.colors = listOf(
+                android.graphics.Color.parseColor("#A7D1AB"),
+                android.graphics.Color.parseColor("#8FBC8F"),
+                android.graphics.Color.parseColor("#66CDAA"),
+                android.graphics.Color.parseColor("#458B74"),
+                android.graphics.Color.parseColor("#2E8B57"),
+                android.graphics.Color.parseColor("#D25BF8")
+            )
             dataSet.sliceSpace = 3f
             dataSet.valueTextSize = 12f
             dataSet.setDrawValues(true)
@@ -253,8 +251,25 @@ class HomeFragment : Fragment() {
             legend.isWordWrapEnabled = true
 
         } else {
-            pieChart.clear()
-            pieChart.centerText = "No expenses yet"
+            val emptyEntries = listOf(PieEntry(1f, "No Data"))
+
+            val emptyDataSet = PieDataSet(emptyEntries, "")
+            emptyDataSet.colors = listOf(android.graphics.Color.parseColor("#a9a9a9"))
+            emptyDataSet.valueTextSize = 0f
+            emptyDataSet.setDrawValues(false)
+
+            val emptyData = PieData(emptyDataSet)
+
+            pieChart.data = emptyData
+            pieChart.setUsePercentValues(false)
+            pieChart.description.isEnabled = false
+            pieChart.centerText = "No expense data"
+            pieChart.setDrawEntryLabels(false)
+            pieChart.animateY(1000)
+            pieChart.invalidate()
+
+            val legend = pieChart.legend
+            legend.isEnabled = false
         }
 
     }

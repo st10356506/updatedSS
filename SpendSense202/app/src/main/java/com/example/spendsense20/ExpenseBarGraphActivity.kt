@@ -105,6 +105,7 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
     }
 
     private fun loadExpensesForPeriod(startDate: Date, endDate: Date) {
+
         expenseSums.clear()
         databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -122,11 +123,10 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
 
                     if (!entryDate.before(startDate) && !entryDate.after(endDate)) {
                         // Normalize category name to match categories list
-                        val category = finance.name.trim()
-                        if (categories.any { it.equals(category, ignoreCase = true) }) {
-                            val key = categories.find { it.equals(category, ignoreCase = true) }!!
-                            expenseSums[key] = (expenseSums[key] ?: 0) + finance.amount.toInt()
-                        }
+                        val categoryRaw = finance.name.trim()
+                        val category = categories.find { it.equals(categoryRaw, ignoreCase = true) } ?: "Other"
+                        expenseSums[category] = (expenseSums[category] ?: 0) + finance.amount.toInt()
+
                     }
                 }
                 // Trigger redraw with updated data
@@ -147,7 +147,7 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
                 val goalEnd = dateFormat.parse(goal.endDate) ?: endDate
                 !(goalEnd.before(startDate) || goalStart.after(endDate)) // Overlapping periods only
             } catch (e: Exception) {
-                true // If parsing fails, include goal by default
+                true
             }
         }
 
@@ -156,7 +156,12 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
         val entriesMax = ArrayList<BarEntry>()
 
         categories.forEachIndexed { index, category ->
-            val categoryGoals = filteredGoals.filter { it.category.equals(category, ignoreCase = true) }
+            val categoryGoals = filteredGoals.filter { goal ->
+                val goalCategory = goal.category.trim()
+                val matchedCategory = categories.find { it.equals(goalCategory, ignoreCase = true) } ?: "Other"
+                matchedCategory.equals(category, ignoreCase = true)
+            }
+
             val minSum = categoryGoals.sumOf { it.minContribution.toInt() }
             val maxSum = categoryGoals.sumOf { it.maxContribution.toInt() }
             val actualSum = expenseSums[category] ?: 0
@@ -165,8 +170,6 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
             entriesActual.add(BarEntry(index.toFloat(), actualSum.toFloat()))
             entriesMax.add(BarEntry(index.toFloat(), maxSum.toFloat()))
         }
-
-        // ... rest of your code remains the same
 
         val setMin = BarDataSet(entriesMin, "Min").apply {
             color = Color.parseColor("#4A90E2")
@@ -243,7 +246,7 @@ class ExpenseBarGraphActivity : AppCompatActivity() {
             setPinchZoom(true)
             setScaleEnabled(true)
             animateY(800)
-            setExtraBottomOffset(20f) // More bottom offset to prevent label cutoff
+            setExtraBottomOffset(20f)
         }
     }
 }

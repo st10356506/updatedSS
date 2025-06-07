@@ -111,7 +111,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/addExpenseButton"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
@@ -121,7 +121,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/addIncomeButton"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
@@ -287,7 +287,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_all_expenses"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
@@ -300,12 +300,11 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_all_income"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
                         android:minWidth="0dp"
-
                         android:ellipsize="end"
                         android:text="All Income"
                         android:backgroundTint="@color/black"

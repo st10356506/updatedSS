@@ -137,9 +137,16 @@ class GProgressFragment : Fragment() {
                     if (entryDate == null) continue
 
                     if (!entryDate.before(monthStart) && !entryDate.after(monthEnd)) {
-                        val category = finance.name.trim()
-                        val currentSum = expenseSums[category] ?: 0
-                        expenseSums[category] = currentSum + finance.amount.toInt()
+                        val cleanedCategory = finance.name.trim()
+                        val normalizedCategory = when {
+                            cleanedCategory.equals("Food", ignoreCase = true) -> "Food"
+                            cleanedCategory.equals("Transport", ignoreCase = true) -> "Transport"
+                            cleanedCategory.equals("Bills", ignoreCase = true) -> "Bills"
+                            cleanedCategory.equals("Shopping", ignoreCase = true) -> "Shopping"
+                            else -> "Other"
+                        }
+                        expenseSums[normalizedCategory] = (expenseSums[normalizedCategory] ?: 0) + finance.amount.toInt()
+
                     }
                 }
                 // Refresh goals UI after loading expenses
@@ -156,11 +163,24 @@ class GProgressFragment : Fragment() {
         viewModel.allGoals.observe(viewLifecycleOwner) { goalWithIdList ->
             val goals = goalWithIdList.map { it.goal }
 
-            updateCategoryViews(goals.filter { it.category.equals("Food", true) }, minFood, progressFood, maxFood, progressBarFood, "Food")
-            updateCategoryViews(goals.filter { it.category.equals("Transport", true) }, minTransport, progressTransport, maxTransport, progressBarTransport, "Transport")
-            updateCategoryViews(goals.filter { it.category.equals("Bills", true) }, minBills, progressBills, maxBills, progressBarBills, "Bills")
-            updateCategoryViews(goals.filter { it.category.equals("Shopping", true) }, minShopping, progressShopping, maxShopping, progressBarShopping, "Shopping")
-            updateCategoryViews(goals.filter { it.category.equals("Other", true) }, minOther, progressOther, maxOther, progressBarOther, "Other")
+            // Normalize categories: group custom ones into "Other"
+            val groupedGoals = goals.groupBy { goal ->
+                val cleanedCategory = goal.category.trim()
+                when {
+                    cleanedCategory.equals("Food", ignoreCase = true) -> "Food"
+                    cleanedCategory.equals("Transport", ignoreCase = true) -> "Transport"
+                    cleanedCategory.equals("Bills", ignoreCase = true) -> "Bills"
+                    cleanedCategory.equals("Shopping", ignoreCase = true) -> "Shopping"
+                    else -> "Other"
+                }
+            }
+
+            // Update views with grouped goals
+            updateCategoryViews(groupedGoals["Food"].orEmpty(), minFood, progressFood, maxFood, progressBarFood, "Food")
+            updateCategoryViews(groupedGoals["Transport"].orEmpty(), minTransport, progressTransport, maxTransport, progressBarTransport, "Transport")
+            updateCategoryViews(groupedGoals["Bills"].orEmpty(), minBills, progressBills, maxBills, progressBarBills, "Bills")
+            updateCategoryViews(groupedGoals["Shopping"].orEmpty(), minShopping, progressShopping, maxShopping, progressBarShopping, "Shopping")
+            updateCategoryViews(groupedGoals["Other"].orEmpty(), minOther, progressOther, maxOther, progressBarOther, "Other")
         }
     }
 
@@ -187,9 +207,26 @@ class GProgressFragment : Fragment() {
             progressTextView.text = "R$actualSpending"
             maxTextView.text = "R$maxSum"
 
-            val progressPercent = if (maxSum > 0) {
-                ((actualSpending.toFloat() / maxSum.toFloat()) * 100).toInt().coerceIn(0, 100)
-            } else 0
+            val progressPercent = when {
+                maxSum <= minSum -> {
+                    // Edge case: if max <= min, just cap progress at 100% if spending >= min
+                    if (actualSpending >= minSum) 100 else ((actualSpending.toFloat() / minSum.toFloat()) * 50).toInt().coerceIn(0, 50)
+                }
+                actualSpending < minSum -> {
+                    // Below min: 0 to 50% progress
+                    ((actualSpending.toFloat() / minSum.toFloat()) * 50).toInt().coerceIn(0, 50)
+                }
+                actualSpending in minSum..maxSum -> {
+                    // Between min and max: 50% to 100% progress
+                    50 + (((actualSpending.toFloat() - minSum) / (maxSum - minSum)) * 50).toInt().coerceIn(0, 50)
+                }
+                else -> {
+                    // Above max: 100%
+                    100
+                }
+
+
+            }
 
             progressBar.progress = progressPercent
         }

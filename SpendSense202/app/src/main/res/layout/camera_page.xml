@@ -36,7 +36,7 @@
             android:popupBackground="#000000"
             android:spinnerMode="dropdown"
             android:autofillHints="#000000"
-            style="@style/BlackTextInputStyle"
+            style="@style/DropdownTextAppearance"
             android:padding="8dp" />
 
         <!-- Optional custom category input  -->
@@ -50,6 +50,7 @@
             android:background="@drawable/edit_text_background"
             android:padding="16dp"
             android:textSize="16sp"
+            android:textColor="@color/black"
             style="@style/BlackTextInputStyle"
             android:elevation="2dp" />
 
@@ -57,9 +58,10 @@
             android:id="@+id/editDescription"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Enter image description"
+            android:hint="Enter finance description"
             android:textSize="16sp"
             android:layout_marginTop="16dp"
+            android:textColor="@color/black"
             style="@style/BlackTextInputStyle"
             android:padding="16dp"
             android:background="@drawable/edit_text_background"
@@ -70,6 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Enter Amount"
+            android:textColor="@color/black"
             style="@style/BlackTextInputStyle"
             android:inputType="numberDecimal"
             android:layout_marginTop="16dp"
@@ -84,11 +87,12 @@
             android:layout_height="56dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/spinner_background"
-            android:padding="8dp"
-            style="@style/BlackTextInputStyle"
             android:popupBackground="#000000"
+            android:spinnerMode="dropdown"
             android:autofillHints="#000000"
-            android:spinnerMode="dropdown" />
+            style="@style/DropdownTextAppearance"
+            android:padding="8dp" />
+
         <EditText
             android:id="@+id/editDate"
             android:layout_width="match_parent"
@@ -100,6 +104,7 @@
             android:padding="16dp"
             android:background="@drawable/edit_text_background"
             android:textSize="16sp"
+            android:textColor="@color/black"
             style="@style/BlackTextInputStyle"
             android:elevation="2dp" />
 

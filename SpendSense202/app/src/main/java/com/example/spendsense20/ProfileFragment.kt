@@ -1,27 +1,32 @@
 package com.example.spendsense20.ui
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.spendsense20.FinanceEntity
 import com.example.spendsense20.Login
 import com.example.spendsense20.R
 import com.example.spendsense20.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import nl.dionsegijn.konfetti.core.Angle
+import nl.dionsegijn.konfetti.xml.KonfettiView
+import java.util.concurrent.TimeUnit
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
-    private lateinit var financeRef: DatabaseReference
     private lateinit var userRef: DatabaseReference
-    private val goal = 15000.0
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +41,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
         val currentUser = auth.currentUser
 
         if (currentUser == null) {
@@ -47,14 +53,12 @@ class ProfileFragment : Fragment() {
 
         val uid = currentUser.uid
         val email = currentUser.email
-
         binding.tvEmail.text = email ?: "No email"
 
-        userRef = FirebaseDatabase.getInstance().getReference("users").child(uid)
-        financeRef = FirebaseDatabase.getInstance().getReference("finances").child(uid)
+        userRef = database.getReference("users").child(uid)
 
-        fetchUsername(uid)
-        fetchRankAndBadge()
+        fetchUsername()
+        fetchRankAndBadge(uid)
 
         binding.btnLogout.setOnClickListener {
             auth.signOut()
@@ -70,9 +74,13 @@ class ProfileFragment : Fragment() {
         binding.ivEdit.setOnClickListener {
             showImageMenu()
         }
+
+        binding.ivRankBadge.setOnClickListener {
+            launchKonfetti()
+        }
     }
 
-    private fun fetchUsername(uid: String) {
+    private fun fetchUsername() {
         userRef.child("username").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val username = snapshot.getValue(String::class.java)
@@ -85,49 +93,54 @@ class ProfileFragment : Fragment() {
         })
     }
 
-    private fun fetchRankAndBadge() {
+    private fun fetchRankAndBadge(uid: String) {
+        val financeRef = database.getReference("finances").child(uid)
+
         financeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val finances = mutableListOf<FinanceEntity>()
+                var totalIncome = 0.0
+                var totalExpense = 0.0
+
                 for (child in snapshot.children) {
-                    val entity = child.getValue(FinanceEntity::class.java)
-                    if (entity != null) {
-                        finances.add(entity)
+                    val type = child.child("type").getValue(String::class.java)
+                    val amount = child.child("amount").getValue(Double::class.java) ?: 0.0
+
+                    if (type == "income") {
+                        totalIncome += amount
+                    } else if (type == "expense") {
+                        totalExpense += amount
                     }
                 }
-                updateRankUI(finances)
+
+                val balance = totalIncome - totalExpense
+                val points = (balance / 100).toInt().coerceAtLeast(0)
+
+                val rank = when {
+                    points >= 800 -> "Platinum"
+                    points >= 500 -> "Emerald"
+                    points >= 250 -> "Gold"
+                    points >= 100 -> "Silver"
+                    else -> "Bronze"
+                }
+
+                binding.tvUserRank.text = rank
+
+                val badgeRes = when (rank) {
+                    "Bronze" -> R.drawable.bronze
+                    "Silver" -> R.drawable.silver
+                    "Gold" -> R.drawable.gold
+                    "Emerald" -> R.drawable.emerald
+                    "Platinum" -> R.drawable.platinum
+                    else -> R.drawable.bronze
+                }
+
+                binding.ivRankBadge.setImageResource(badgeRes)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("ProfileFragment", "Failed to fetch finances: ${error.message}")
+                Log.e("ProfileFragment", "Failed to fetch finance data: ${error.message}")
             }
         })
-    }
-
-    private fun updateRankUI(finances: List<FinanceEntity>) {
-        val income = finances.filter { it.type == "income" }.sumOf { it.amount }
-        val expenses = finances.filter { it.type == "expense" }.sumOf { it.amount }
-        val balance = income - expenses
-
-        val points = (balance / 100).toInt().coerceAtLeast(0)
-        val rank = when {
-            points >= 200 -> "Platinum"
-            points >= 100 -> "Gold"
-            points >= 50 -> "Silver"
-            else -> "Bronze"
-        }
-
-        binding.tvUserRank.text = rank
-
-        val badgeRes = when (rank) {
-            "Bronze" -> R.drawable.bronze
-            "Silver" -> R.drawable.silver
-            "Gold" -> R.drawable.gold
-            "Platinum" -> R.drawable.platinum
-            else -> R.drawable.bronze
-        }
-
-        binding.ivRankBadge.setImageResource(badgeRes)
     }
 
     private fun showImageMenu() {
@@ -147,6 +160,26 @@ class ProfileFragment : Fragment() {
             }
         }
         popup.show()
+    }
+
+    private fun launchKonfetti() {
+        binding.konfettiView.start(
+            Party(
+                speed = 0f,
+                maxSpeed = 30f,
+                damping = 0.9f,
+                spread = 360,
+                angle = Angle.BOTTOM,
+                colors = listOf(
+                    0xFF006400.toInt(),
+                    0xFF228B22.toInt(),
+                    0xFF32CD32.toInt(),
+                    0xFF7CFC00.toInt()
+                ),
+                emitter = Emitter(duration = 2, TimeUnit.SECONDS).max(100),
+                position = Position.Relative(0.5, 0.3)
+            )
+        )
     }
 
     override fun onDestroyView() {

@@ -39,6 +39,11 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!isValidPassword(password)) {
+                passwordEditText.error = "Password must be at least 6 characters, include uppercase, lowercase, and a number"
+                return@setOnClickListener
+            }
+
             firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -73,4 +78,7 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
     }
+}   private fun isValidPassword(password: String): Boolean {
+     val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$")
+     return passwordRegex.matches(password)
 }

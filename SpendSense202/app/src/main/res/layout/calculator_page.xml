@@ -6,7 +6,7 @@
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F4F4">
+    android:background="#EFECE7">
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
         <Button android:id="@+id/btnDiv" android:text="/" style="@null"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_margin="4dp" android:layout_columnWeight="1"
-            android:backgroundTint="#FFC107" android:textColor="#000000" android:textSize="18sp"/>
+            android:backgroundTint="@color/black" android:textColor="@color/white" android:textSize="18sp"/>
 
         <!-- Row 2 -->
         <Button android:id="@+id/btn4" android:text="4" style="@null"
@@ -78,7 +78,7 @@
         <Button android:id="@+id/btnMul" android:text="*" style="@null"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_margin="4dp" android:layout_columnWeight="1"
-            android:backgroundTint="#FFC107" android:textColor="#000000" android:textSize="18sp"/>
+            android:backgroundTint="@color/black" android:textColor="@color/white" android:textSize="18sp"/>
 
         <!-- Row 3 -->
         <Button android:id="@+id/btn1" android:text="1" style="@null"
@@ -99,7 +99,7 @@
         <Button android:id="@+id/btnSub" android:text="-" style="@null"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_margin="4dp" android:layout_columnWeight="1"
-            android:backgroundTint="#FFC107" android:textColor="#000000" android:textSize="18sp"/>
+            android:backgroundTint="@color/black" android:textColor="@color/white" android:textSize="18sp"/>
 
         <!-- Row 4 -->
         <Button android:id="@+id/btn0" android:text="0" style="@null"
@@ -115,12 +115,12 @@
         <Button android:id="@+id/btnClear" android:text="C" style="@null"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_margin="4dp" android:layout_columnWeight="1"
-            android:backgroundTint="#F44336" android:textColor="#FFFFFF" android:textSize="18sp"/>
+            android:backgroundTint="#458B74" android:textColor="#FFFFFF" android:textSize="18sp"/>
 
         <Button android:id="@+id/btnAdd" android:text="+" style="@null"
             android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_margin="4dp" android:layout_columnWeight="1"
-            android:backgroundTint="#FFC107" android:textColor="#000000" android:textSize="18sp"/>
+            android:backgroundTint="@color/black" android:textColor="@color/white" android:textSize="18sp"/>
 
         <!-- Equals button (spans full row) -->
         <Button
@@ -129,7 +129,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="@color/black"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"

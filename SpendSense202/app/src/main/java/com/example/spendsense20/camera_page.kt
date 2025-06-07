@@ -1,5 +1,6 @@
 package com.example.spendsense20
 
+import android.R.layout.simple_spinner_dropdown_item
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
+import android.widget.Spinner
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,6 +30,7 @@ class CameraPage : AppCompatActivity() {
     private lateinit var binding: CameraPageBinding
     private lateinit var financeAdapter: FinanceAdapter
     private lateinit var imageUri: Uri
+    private lateinit var spinner_item : Spinner
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var databaseRef: DatabaseReference
@@ -108,12 +111,12 @@ class CameraPage : AppCompatActivity() {
         }
 
         val categories = listOf("Food", "Transport", "Bills", "Shopping", "Salary", "Cheque", "Investments", "Bonus", "Other")
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        val spinnerAdapter = ArrayAdapter(this, R.layout.spinner_item, categories)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCategory.adapter = spinnerAdapter
 
         val typeOptions = listOf("Expense", "Income")
-        val typeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, typeOptions)
+        val typeAdapter = ArrayAdapter(this, R.layout.spinner_item, typeOptions)
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerType.adapter = typeAdapter
 
