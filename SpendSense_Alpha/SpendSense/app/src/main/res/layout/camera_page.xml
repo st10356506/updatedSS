@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EFECE7"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="#EFECE7">
+
+        <!-- Heading -->
+        <!-- OpenAI (2025). Assistance with designing and cleaning XML in Android Studio. [online] Available at: https://www.openai.com [Accessed 1 May 2025]. -->
+
+        <TextView
+            android:id="@+id/textHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADD FINANCE"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/primary_text"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp" />
+
+        <!-- Category Spinner -->
+        <!--  Developers, A. (n.d.). Spinners. [online] Android Developers. Available at: https://developer.android.com/develop/ui/views/components/spinner -->
+        <!--  A. Sharabiani (2018). Android - How to create a drop-down list? [online] Stack Overflow. Available at: https://stackoverflow.com/questions/13377361/how-to-create-a-drop-down-list -->
+
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="#000000"
+            android:spinnerMode="dropdown"
+            android:autofillHints="#000000"
+            style="@style/DropdownTextAppearance"
+            android:padding="8dp" />
+
+        <!-- Optional Custom Category Input -->
+        <!--  GeeksforGeeks (2021). Implementing Edit Profile Data Functionality in Social Media Android App. [online] Available at: https://www.geeksforgeeks.org/implementing-edit-profile-data-functionality-in-social-media-android-app/ -->
+
+        <EditText
+            android:id="@+id/editCustomCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter custom category"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            style="@style/BlackTextInputStyle"
+            android:elevation="2dp" />
+
+        <!-- Description Input -->
+        <EditText
+            android:id="@+id/editDescription"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter finance description"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black"
+            style="@style/BlackTextInputStyle"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:elevation="2dp" />
+
+        <!-- Amount Input -->
+        <EditText
+            android:id="@+id/editAmount"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter Amount"
+            android:textColor="@color/black"
+            style="@style/BlackTextInputStyle"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textSize="16sp"
+            android:elevation="2dp" />
+
+        <!-- Type Spinner -->
+        <!--  Developers, A. (n.d.). Spinners. [online] Android Developers. Available at: https://developer.android.com/develop/ui/views/components/spinner -->
+
+        <Spinner
+            android:id="@+id/spinnerType"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="#000000"
+            android:spinnerMode="dropdown"
+            android:autofillHints="#000000"
+            style="@style/DropdownTextAppearance"
+            android:padding="8dp" />
+
+        <!-- Date Input (non-editable, clickable for date picker) -->
+        <!-- GeeksforGeeks (2019a). Android | Creating a Calendar View app. [online] Available at: https://www.geeksforgeeks.org/android-creating-a-calendar-view-app/ -->
+
+        <EditText
+            android:id="@+id/editDate"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Select Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            style="@style/BlackTextInputStyle"
+            android:elevation="2dp" />
+
+        <!-- Image Container -->
+        <!-- Reference: Developers, A. (2024). Get started with camera on Android. [online] Android Developers. Available at: https://developer.android.com/media/camera/get-started-with-camera -->
+
+        <FrameLayout
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/image_container_background"
+            android:elevation="4dp">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_add_photo_alternate_24" />
+        </FrameLayout>
+
+        <!-- Button Group (Capture and Delete) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnCapture"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Capture Image"
+                android:backgroundTint="@color/emerald_green"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:elevation="4dp" />
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="1dp"
+                android:layout_height="56dp" />
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <Button
+            android:id="@+id/btnDone"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Done"
+            android:backgroundTint="#000000"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:elevation="4dp" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Back"
+            android:textSize="16sp"
+            android:backgroundTint="#000000"
+            android:textColor="#ffffff"
+            android:elevation="4dp" />
+
+        <!-- RecyclerView for displaying list -->
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+
+    </LinearLayout>
+</ScrollView>

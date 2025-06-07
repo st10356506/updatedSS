@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/selector_background"/> <!-- Green color for selected item -->
+    <corners android:radius="16dp"/>
+    <size android:width="56dp" android:height="56dp"/> <!-- Adjust size based on icon size -->
+</shape>
