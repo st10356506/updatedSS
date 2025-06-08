@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+References:
+- Android Developers (n.d.). ScrollView.
+  https://developer.android.com/reference/android/widget/ScrollView
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".GoalFragment">
+
+    <!--
+    References:
+    - Android Developers (n.d.). LinearLayout.
+      https://developer.android.com/reference/android/widget/LinearLayout
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="#EFECE7">
+
+        <!-- Header -->
+        <!--
+        References:
+        - Android Developers (n.d.). TextView.
+          https://developer.android.com/reference/android/widget/TextView
+        -->
+        <TextView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/header_gradient_background"
+            android:padding="20dp"
+            android:text="Goals"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:elevation="4dp"
+            android:drawablePadding="12dp" />
+
+        <!-- Category Spinner -->
+        <!--
+        References:
+        - Developers, A. (n.d.). Spinners.
+          https://developer.android.com/develop/ui/views/components/spinner
+        - Sharabiani, A. (2018). Android - How to create a drop-down list?
+          https://stackoverflow.com/questions/13377361/how-to-create-a-drop-down-list
+        -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="#000000"
+            android:spinnerMode="dropdown"
+            android:padding="8dp"
+            android:paddingTop="18dp"
+            style="@style/DropdownTextAppearance"
+            android:contentDescription="Select category" />
+
+        <!-- Other category input -->
+        <!--
+        References:
+        - Android Developers (n.d.). EditText.
+          https://developer.android.com/reference/android/widget/EditText
+        -->
+        <EditText
+            android:id="@+id/editCustomCategory"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter custom category"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:background="@drawable/edit_text_background"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            style="@style/BlackTextInputStyle"
+            android:elevation="2dp" />
+
+        <!-- Pick Date Buttons Side-by-Side -->
+        <!--
+        References:
+        - Android Developers (n.d.). LinearLayout.
+          https://developer.android.com/reference/android/widget/LinearLayout
+        - Android Developers (n.d.). Button.
+          https://developer.android.com/reference/android/widget/Button
+        -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:weightSum="2"
+            android:padding="8dp">
+
+            <!-- Start Date Section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btnStartPickDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pick Start Date"
+                    android:backgroundTint="@color/black"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/startDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="italic"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- End Date Section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btnEndPickDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pick End Date"
+                    android:backgroundTint="@color/black"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/endDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textStyle="italic"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#000000" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvYourRewards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enter Spending Range"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:padding="8dp" />
+
+        <!-- Max/Min Labels -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvMax"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Max"
+                android:textColor="@android:color/black"
+                android:textStyle="italic"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/tvMin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Min"
+                android:textColor="@android:color/black"
+                android:textStyle="italic"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- Min/Max Input -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <EditText
+                    android:id="@+id/editTextMaxInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:textColorHint="@color/black"
+                    android:hint="Max"
+                    android:inputType="number"
+                    android:layout_marginStart="16dp" />
+
+                <EditText
+                    android:id="@+id/editTextMinInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:hint="Min"
+                    android:layout_gravity="center"
+                    android:textColorHint="@color/black"
+                    android:inputType="number" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Monthly Contribution Range -->
+        <!--
+        - GeeksforGeeks (2019). Creating a SeekBar in Android.
+          https://www.geeksforgeeks.org/android-creating-a-seekbar/
+        - Show, S. (2017). Android SeekBar: Show progress value along the seekbar.
+          https://stackoverflow.com/questions/41774963/android-seekbar-show-progress-value-along-the-seekbar
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="16dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <SeekBar
+                    android:id="@+id/seekBarMin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressTint="#2E7D32"
+                    android:thumbTint="#2E7D32"
+                    android:layout_marginBottom="8dp" />
+
+                <SeekBar
+                    android:id="@+id/seekBarMax"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressTint="#2E7D32"
+                    android:thumbTint="#2E7D32"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/currentRangeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Range: R0 - R0"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="16sp"
+                    android:gravity="center_horizontal" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddGoal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Goal"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/emerald_green"
+            android:textColor="#FFFFFF"
+            android:contentDescription="Tap to create a new financial goal" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/goalsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:clipToPadding="false" />
+    </LinearLayout>
+</ScrollView>
